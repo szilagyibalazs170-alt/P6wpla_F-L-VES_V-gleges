@@ -18,7 +18,10 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
+import android.view.KeyEvent
 import android.view.View
+import android.app.UiModeManager
+import android.content.res.Configuration
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
@@ -90,9 +93,13 @@ class MainActivity : Activity() {
             addJavascriptInterface(Bridge(), "HaloNative")
         }
         setContentView(web)
+        web.isFocusable = true
+        web.isFocusableInTouchMode = true
+        web.requestFocus()
         MediaHub.emit = { code -> if (pageReady) web.evaluateJavascript(code, null) }
         Beat.onLevel = { lvl -> main.post { if (pageReady) web.evaluateJavascript("window.Halo&&Halo.onLevel($lvl)", null) } }
         Devices.emit = { code -> main.post { if (pageReady) web.evaluateJavascript(code, null) } }
+        Link.emit = { code -> main.post { if (pageReady) web.evaluateJavascript(code, null) } }
         Voice.emit = { code -> main.post { if (pageReady) web.evaluateJavascript(code, null) } }
         applyRefresh(true)
         handleIntent(intent)
@@ -155,12 +162,14 @@ class MainActivity : Activity() {
         hideBars()
         web.onResume()
         resumed = true
+        Link.stopBackground()
         if (pageReady) MediaHub.attach(this)
         flushAuth()
     }
 
     override fun onPause() {
         resumed = false
+        if (Link.hasTarget) Link.startBackground()
         web.onPause()
         super.onPause()
     }
@@ -179,6 +188,9 @@ class MainActivity : Activity() {
 
     override fun onDestroy() {
         MediaHub.emit = null
+        Link.emit = null
+        Link.stopDisplay()
+        Link.stopDiscover()
         Devices.emit = null
         Devices.stopScan()
         Voice.emit = null
@@ -229,8 +241,31 @@ class MainActivity : Activity() {
                 .putExtra(Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME,
                     ComponentName(this, MediaListenerService::class.java).flattenToString())
         else null
-        try { startActivity(detail ?: Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }
-        catch (_: Exception) { startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }
+        for (i in listOfNotNull(detail, Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS), Intent(Settings.ACTION_SETTINGS))) {
+            try { startActivity(i); return } catch (_: Exception) { }
+        }
+    }
+
+    private val isTV: Boolean get() =
+        (getSystemService(Context.UI_MODE_SERVICE) as UiModeManager).currentModeType == Configuration.UI_MODE_TYPE_TELEVISION ||
+            packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
+
+    /** Távirányító médiagombjai → a felület kezeli (a projektoron a telefonnak küldi tovább). */
+    override fun dispatchKeyEvent(e: KeyEvent): Boolean {
+        val k = when (e.keyCode) {
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> "toggle"
+            KeyEvent.KEYCODE_MEDIA_PLAY -> "play"
+            KeyEvent.KEYCODE_MEDIA_PAUSE -> "pause"
+            KeyEvent.KEYCODE_MEDIA_NEXT, KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> "next"
+            KeyEvent.KEYCODE_MEDIA_PREVIOUS, KeyEvent.KEYCODE_MEDIA_REWIND -> "prev"
+            KeyEvent.KEYCODE_MENU -> "menu"
+            else -> null
+        }
+        if (k != null && pageReady) {
+            if (e.action == KeyEvent.ACTION_DOWN && e.repeatCount == 0) web.evaluateJavascript("window.Halo&&Halo.onKey&&Halo.onKey('$k')", null)
+            return true
+        }
+        return super.dispatchKeyEvent(e)
     }
 
     private fun audio() = getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -241,12 +276,29 @@ class MainActivity : Activity() {
             pageReady = true
             MediaHub.attach(this@MainActivity)
             try { Devices.init(this@MainActivity); Devices.push() } catch (_: Exception) { }
+            if (isTV) Link.startDisplay(this@MainActivity, Build.MODEL)
             flushAuth()
         }
         /** Spotify bejelentkezés előtt: elindítja a helyi fogadót (http://127.0.0.1:43821/callback). */
         @JavascriptInterface fun authListen() { AuthServer.start { url -> main.post { deliverAuth(url) } } }
         @JavascriptInterface fun redirectUri(): String = AuthServer.REDIRECT
         @JavascriptInterface fun setHighRefresh(on: Boolean) = runOnUiThread { applyRefresh(on) }
+
+        /* ---- Halo Link: kivetítés a projektorra ---- */
+        @JavascriptInterface fun isTV(): Boolean = this@MainActivity.isTV
+        @JavascriptInterface fun deviceName(): String = Settings.Global.getString(contentResolver, "device_name") ?: Build.MODEL
+        @JavascriptInterface fun linkDisplay(on: Boolean) = runOnUiThread { if (on) Link.startDisplay(this@MainActivity, deviceName()) else Link.stopDisplay() }
+        @JavascriptInterface fun linkDiscover() = runOnUiThread { Link.discover(this@MainActivity) }
+        @JavascriptInterface fun linkStopDiscover() = runOnUiThread { Link.stopDiscover() }
+        @JavascriptInterface fun linkAnswer(id: String, allow: Boolean) { Link.answer(id, allow) }
+        @JavascriptInterface fun linkQueue(cmd: String) { Link.queue(cmd) }
+        @JavascriptInterface fun linkStart(host: String, port: Int, key: String, name: String, from: String) = runOnUiThread {
+            Link.setTarget(host, port, key); Link.fromName = from; HaloLinkService.start(this@MainActivity, name)
+            if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 46)
+        }
+        @JavascriptInterface fun linkStop() = runOnUiThread { Link.clearTarget(); HaloLinkService.stop(this@MainActivity) }
+        @JavascriptInterface fun linkSettings(json: String) { Link.settingsJson = json }
 
         /* ---- eszközök: Bluetooth, Chromecast, kimenet ---- */
         @JavascriptInterface fun devicesOpen() = runOnUiThread {
@@ -340,7 +392,7 @@ class MainActivity : Activity() {
                 try {
                     val con = URL(url).openConnection() as HttpURLConnection
                     con.requestMethod = method
-                    con.connectTimeout = 10000; con.readTimeout = 15000
+                    con.connectTimeout = 8000; con.readTimeout = 40000
                     con.setRequestProperty("User-Agent", "HaloPlayer/1.1 (Android)")
                     if (headers.isNotBlank()) JSONObject(headers).let { h -> h.keys().forEach { con.setRequestProperty(it, h.getString(it)) } }
                     if (body.isNotEmpty() && method != "GET") {

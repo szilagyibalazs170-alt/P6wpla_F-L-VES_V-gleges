@@ -606,3 +606,28 @@ input{font:inherit;color:inherit}
 #voiceHint{font-size:.66rem;color:var(--muted);margin-top:.25rem}
 #voice.done #voiceHint{display:none}
 @media (orientation:portrait){#dev{width:100vw}#voice{bottom:16vh}}
+
+/* ---------- kivetítés (Halo Link) ---------- */
+#srcBadge .lnk{display:none;align-items:center;gap:.3rem;color:var(--muted);font-weight:600}
+#srcBadge .lnk.on{display:inline-flex}
+#srcBadge .lnk svg{width:.85rem;height:.85rem}#srcBadge .lnk i{font-style:normal;opacity:.6}
+#linkAsk{position:absolute;z-index:98;left:50%;top:50%;transform:translate(-50%,-46%) scale(.96);opacity:0;pointer-events:none;transition:all .45s cubic-bezier(.2,1.2,.3,1);
+  display:flex;gap:1.2rem;align-items:center;padding:1.6rem 2rem;border-radius:1.6rem;background:rgba(16,14,22,.92)}
+#linkAsk.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+#linkAsk .k{font-size:.6rem;font-weight:800;letter-spacing:.16em;color:var(--accent)}
+#linkAsk .t{font-size:1.4rem;font-weight:800;margin:.2rem 0 .2rem}
+#linkWait{position:absolute;z-index:74;left:50%;top:54%;transform:translate(-50%,-50%);width:min(40rem,86vw);padding:1.8rem 2.2rem;display:none;border-radius:1.6rem}
+#linkWait.on{display:block}
+#linkWait .k{font-size:.62rem;font-weight:800;letter-spacing:.18em;color:var(--accent)}
+#linkWait h2{font-family:var(--lyrfont);font-variation-settings:'SOFT' 100;font-weight:900;font-size:2.1rem;margin:.3rem 0 .8rem}
+#linkWait ol{font-size:.85rem;line-height:1.7;color:var(--muted);padding-left:1.2rem}#linkWait ol b{color:var(--text)}
+#linkWait .keys{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.1rem}
+#linkWait .keys span{font-size:.7rem;color:var(--muted);padding:.35rem .7rem;border-radius:99px;background:var(--hi)}#linkWait .keys b{color:var(--text)}
+/* projektor / TV: távirányítós fókusz, egérmutató nélkül */
+.tv,.tv *{cursor:none!important}
+.tv :focus{outline:none}
+.tv :focus-visible,.tv .sl:focus,.tv .drow:focus,.tv .srow2:focus,.tv .acard:focus,.tv .row:focus,.tv .lcard:focus,.tv .tcard:focus,.tv .bgi:focus,.tv .sw:focus{outline:3px solid var(--accent)!important;outline-offset:3px;
+  box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 25%,transparent),0 0 2rem color-mix(in srgb,var(--accent) 45%,transparent)!important;border-radius:.8rem;transform:scale(1.04);transition:transform .2s,box-shadow .2s}
+.tv .ib:focus-visible{border-radius:50%}
+.tv #tools,.tv .minis,.tv .srow .search{display:none}
+.tv{--blur:14px}

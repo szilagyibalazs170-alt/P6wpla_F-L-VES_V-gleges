@@ -14,7 +14,7 @@ const DIC = {
   refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg>',
 };
 IC.cast = DIC.cast;
-const KIND_LABEL = { bluetooth: 'Bluetooth', cast: 'Chromecast', wired: 'Vezetékes', usb: 'USB', hdmi: 'HDMI', speaker: 'Beépített' };
+const KIND_LABEL = { display: 'Kivetítés', bluetooth: 'Bluetooth', cast: 'Chromecast', wired: 'Vezetékes', usb: 'USB', hdmi: 'HDMI', speaker: 'Beépített' };
 
 const devices = (() => {
   const el = $('#dev'), body = $('#devBody');
@@ -31,7 +31,8 @@ const devices = (() => {
     if (!open()) return;
     const o = st.output;
     let h = `<div class="now panel"><span class="ring">${devIcon(o.kind === 'cast' ? 'tv' : o.kind === 'speaker' ? 'phone' : o.kind)}</span><div><div class="k">MOST ITT SZÓL</div><div class="t">${esc(o.name)}</div><div class="a">${esc(KIND_LABEL[o.kind] || '')}${S.title ? ' · ' + esc(S.title) : ''}</div></div></div>`;
-    if (NATIVE) h += `<div class="dacts"><button class="btn" data-d="output">${DIC.output} Kimenet váltása</button><button class="btn" data-d="mirror">${DIC.mirror} Képernyő kivetítése</button><button class="btn" data-d="btset">${DIC.bluetooth} Bluetooth</button></div>`;
+    if (NATIVE) h += `<div class="dacts"><button class="btn" data-d="output">${DIC.output} Kimenet váltása</button><button class="btn" data-d="mirror">${DIC.mirror} Képernyőtükrözés</button><button class="btn" data-d="btset">${DIC.bluetooth} Bluetooth</button></div>`;
+    h += link.section();
     // Chromecast
     if (NATIVE) {
       h += `<h3>${DIC.cast} Chromecast és Google Cast ${st.casting ? '<button class="lnk" data-d="caststop">Leválasztás</button>' : ''}</h3>`;
@@ -66,7 +67,7 @@ const devices = (() => {
   }
   function show() {
     el.classList.add('on'); $('#scrim').classList.add('on'); app.classList.remove('idle');
-    if (NATIVE) N('devicesOpen');
+    if (NATIVE) { N('devicesOpen'); if (!S.tv) N('linkDiscover'); }
     render(); loadSp();
   }
   function hide() { el.classList.remove('on'); if (!lib.isOpen && !$('#sheet').classList.contains('on')) $('#scrim').classList.remove('on'); N('devicesClose'); }
@@ -101,6 +102,7 @@ const devices = (() => {
     if (d === 'btset') return N('btSettings');
     if (d === 'rescan') { N('devicesOpen'); return; }
     if (d === 'caststop') { N('castStop'); return; }
+    const lk = t.closest('[data-link]'); if (lk) return link.click(lk.dataset.link);
     const c = t.closest('[data-cast]'); if (c) { const r = st.casts.find(x => x.id === c.dataset.cast); if (r && !r.selected) castTo(r); return; }
     const sp = t.closest('[data-sp]'); if (sp) { try { await spotify.transfer(sp.dataset.sp); toastMsg('Átküldve ✓'); } catch (er) { toastMsg('Nem sikerült: ' + er.message); } return loadSp(); }
     const b = t.closest('[data-bt]'); if (b) { if (b.dataset.conn === '1') N('outputSwitcher'); else { toastMsg('Kapcsold be a hangszórót — a rendszer kimenetváltójában is választhatod'); N('outputSwitcher'); } return; }
@@ -112,7 +114,7 @@ const devices = (() => {
   function banner(ev) {
     const bn = $('#devBanner');
     const txt = { connected: 'Csatlakozva', disconnected: 'Leválasztva', paired: 'Párosítva', failed: 'Nem sikerült csatlakozni' }[ev.type] || ev.type;
-    const icon = ev.kind === 'cast' ? DIC.tv : ev.kind === 'bluetooth' ? DIC.bluetooth : ev.kind === 'wired' ? DIC.headphones : DIC.speaker;
+    const icon = ev.kind === 'cast' || ev.kind === 'display' ? DIC.tv : ev.kind === 'bluetooth' ? DIC.bluetooth : ev.kind === 'wired' ? DIC.headphones : DIC.speaker;
     bn.className = 'panel ' + ev.type; bn.innerHTML = `<span class="ring">${icon}</span><div><div class="k">${esc(KIND_LABEL[ev.kind] || 'Eszköz')} · ${esc(txt)}</div><div class="t">${esc(ev.name)}</div></div>`;
     void bn.offsetWidth; bn.classList.add('on'); S.flashAt = performance.now();
     clearTimeout(bT); bT = setTimeout(() => bn.classList.remove('on'), 3800);
@@ -132,5 +134,5 @@ const devices = (() => {
     b.innerHTML = show ? `<i>→</i>${devIcon(o.kind === 'cast' ? 'tv' : o.kind)}<span>${esc(o.name)}</span>` : '';
     b.classList.toggle('on', !!show);
   }
-  return { show, hide, get isOpen() { return open(); }, castTo, get state() { return st; }, castCurrent };
+  return { show, hide, get isOpen() { return open(); }, castTo, get state() { return st; }, castCurrent, refresh: render };
 })();

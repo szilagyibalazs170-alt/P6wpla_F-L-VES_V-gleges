@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Google TV kezdőképernyő-csempe (320×180) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="320dp" android:height="180dp" android:viewportWidth="320" android:viewportHeight="180">
+    <path android:pathData="M0,0h320v180h-320z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="0" android:startY="0" android:endX="320" android:endY="180"
+                android:startColor="#3A1230" android:endColor="#07060A" />
+        </aapt:attr>
+    </path>
+    <!-- izzó keret -->
+    <path android:pathData="M4,4h312v172h-312z" android:strokeWidth="3" android:fillColor="#00000000" android:strokeColor="#FF4FA3" android:strokeAlpha="0.55" />
+    <!-- gyűrű + hangjegy -->
+    <path android:pathData="M90,58a32,32 0,1 1,0 64a32,32 0,1 1,0 -64z" android:strokeWidth="4" android:fillColor="#00000000" android:strokeColor="#FF7AB8" />
+    <path android:fillColor="#FFFFFF" android:pathData="M77,103a6,6 0,1 0,12 0a6,6 0,1 0,-12 0z M95,98a6,6 0,1 0,12 0a6,6 0,1 0,-12 0z M86,77h3.4v26h-3.4z M104,72h3.4v26h-3.4z M86,73L107.4,67.5V74.5L86,80z" />
+    <!-- HALO felirat (egyszerű vonalakból) -->
+    <path android:fillColor="#FFFFFF" android:pathData="M150,70h7v16h14v-16h7v40h-7v-17h-14v17h-7z M196,70h8l14,40h-7.5l-3,-9h-15l-3,9h-7.5z M200,78l-5.5,16h11z M226,70h7v33h18v7h-25z M272,69c11,0 19,9 19,21s-8,21 -19,21s-19,-9 -19,-21s8,-21 19,-21z M272,76c-7,0 -12,6 -12,14s5,14 12,14s12,-6 12,-14s-5,-14 -12,-14z" />
+</vector>

@@ -622,6 +622,31 @@ input{font:inherit;color:inherit}
 #voiceHint{font-size:.66rem;color:var(--muted);margin-top:.25rem}
 #voice.done #voiceHint{display:none}
 @media (orientation:portrait){#dev{width:100vw}#voice{bottom:16vh}}
+
+/* ---------- kivetítés (Halo Link) ---------- */
+#srcBadge .lnk{display:none;align-items:center;gap:.3rem;color:var(--muted);font-weight:600}
+#srcBadge .lnk.on{display:inline-flex}
+#srcBadge .lnk svg{width:.85rem;height:.85rem}#srcBadge .lnk i{font-style:normal;opacity:.6}
+#linkAsk{position:absolute;z-index:98;left:50%;top:50%;transform:translate(-50%,-46%) scale(.96);opacity:0;pointer-events:none;transition:all .45s cubic-bezier(.2,1.2,.3,1);
+  display:flex;gap:1.2rem;align-items:center;padding:1.6rem 2rem;border-radius:1.6rem;background:rgba(16,14,22,.92)}
+#linkAsk.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+#linkAsk .k{font-size:.6rem;font-weight:800;letter-spacing:.16em;color:var(--accent)}
+#linkAsk .t{font-size:1.4rem;font-weight:800;margin:.2rem 0 .2rem}
+#linkWait{position:absolute;z-index:74;left:50%;top:54%;transform:translate(-50%,-50%);width:min(40rem,86vw);padding:1.8rem 2.2rem;display:none;border-radius:1.6rem}
+#linkWait.on{display:block}
+#linkWait .k{font-size:.62rem;font-weight:800;letter-spacing:.18em;color:var(--accent)}
+#linkWait h2{font-family:var(--lyrfont);font-variation-settings:'SOFT' 100;font-weight:900;font-size:2.1rem;margin:.3rem 0 .8rem}
+#linkWait ol{font-size:.85rem;line-height:1.7;color:var(--muted);padding-left:1.2rem}#linkWait ol b{color:var(--text)}
+#linkWait .keys{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.1rem}
+#linkWait .keys span{font-size:.7rem;color:var(--muted);padding:.35rem .7rem;border-radius:99px;background:var(--hi)}#linkWait .keys b{color:var(--text)}
+/* projektor / TV: távirányítós fókusz, egérmutató nélkül */
+.tv,.tv *{cursor:none!important}
+.tv :focus{outline:none}
+.tv :focus-visible,.tv .sl:focus,.tv .drow:focus,.tv .srow2:focus,.tv .acard:focus,.tv .row:focus,.tv .lcard:focus,.tv .tcard:focus,.tv .bgi:focus,.tv .sw:focus{outline:3px solid var(--accent)!important;outline-offset:3px;
+  box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 25%,transparent),0 0 2rem color-mix(in srgb,var(--accent) 45%,transparent)!important;border-radius:.8rem;transform:scale(1.04);transition:transform .2s,box-shadow .2s}
+.tv .ib:focus-visible{border-radius:50%}
+.tv #tools,.tv .minis,.tv .srow .search{display:none}
+.tv{--blur:14px}
 </style>
 </head>
 <body>
@@ -640,7 +665,9 @@ input{font:inherit;color:inherit}
   <div id="klyr"></div>
   <canvas id="glow"></canvas>
 
-  <div id="srcBadge"><span class="srcdot"></span><span class="name">Demó</span><span class="out"></span></div>
+  <div id="srcBadge"><span class="srcdot"></span><span class="name">Demó</span><span class="out"></span><span class="lnk"></span></div>
+  <div id="linkWait" class="panel"></div>
+  <div id="linkAsk" class="panel"></div>
   <div id="devBanner" class="panel"></div>
   <div id="tools">
     <button class="ib" data-act="mic" aria-label="Hangvezérlés"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></svg></button>
@@ -1350,6 +1377,12 @@ const lp = (() => {
 
 /* ----- vezérlés: a forrás szerint ----- */
 function control(a, v) {
+  if (S.mode === 'remote') {
+    N('linkQueue', JSON.stringify({ a, v: v ?? '' }));
+    if (a === 'toggle') a = S.playing ? 'pause' : 'play';
+    if (a === 'play' || a === 'pause') { S.pos = curPos(); S.at = performance.now(); S.playing = a === 'play'; app.classList.toggle('paused', !S.playing); hooks.paint(); }
+    return;
+  }
   if (lp.active) return lp.control(a, v);
   if (a === 'toggle') a = S.playing ? 'pause' : 'play';
   if (a === 'play' || a === 'pause') { S.pos = curPos(); S.at = performance.now(); S.playing = a === 'play'; app.classList.toggle('paused', !S.playing); hooks.paint(); }
@@ -1399,6 +1432,7 @@ let toastMsg = () => {};
 window.Halo = {
   onState(o) {
     if (typeof o === 'string') o = JSON.parse(o);
+    if (S.mode === 'remote' && performance.now() - (S.remoteAt || 0) < 8000) return;
     if (lp.active && NATIVE) { if (!o.playing) return; lp.stop(); }
     S.mode = 'native'; setTrack(o);
   },
@@ -1502,7 +1536,7 @@ function paint(lists = false, artChanged = false) {
   $$('[data-act=lyrics]').forEach(e => e.classList.toggle('on', set.lyr));
   $$('[data-act=shuffle],[data-act=repeat]').forEach(e => e.classList.toggle('dis', S.mode === 'native' && !S.canShuffle && !S.canRepeat));
   app.classList.toggle('minimal', !!set.minimal);
-  $('#onboard').classList.toggle('on', NATIVE && !S.access);
+  $('#onboard').classList.toggle('on', NATIVE && !S.access && !S.tv);
   if (artChanged) markCurAlbum();
   if (lists || artChanged) { renderQueue(); flow.render(); renderAlbumRows(); }
 }
@@ -1653,7 +1687,7 @@ const glow = (() => {
   const cv = $('#glow'), ctx = cv.getContext('2d');
   let w = 0, h = 0, sc = 0.5, parts = [], lastSpawn = 0, ph = 0, lt = 0;
   const api = { colors: ['#ff4fa3', '#ff9a4d'] };
-  function resize() { sc = innerWidth * innerHeight > 1.2e6 ? 0.42 : 0.55; w = cv.width = Math.round(innerWidth * sc); h = cv.height = Math.round(innerHeight * sc); }
+  function resize() { sc = (innerWidth * innerHeight > 1.2e6 ? 0.42 : 0.55) * (S.tv ? Math.min(2, devicePixelRatio || 1) : 1); w = cv.width = Math.round(innerWidth * sc); h = cv.height = Math.round(innerHeight * sc); }
   addEventListener('resize', resize); resize();
   const n = (u, t) => 0.5 + 0.5 * (0.5 * Math.sin(u * 5.1 + t * 1.2) + 0.3 * Math.sin(u * 11.7 - t * 1.9) + 0.2 * Math.sin(u * 23.3 + t * 3.1));
   function edge(len, depth, t, seed, map) {
@@ -1815,7 +1849,7 @@ addEventListener('keydown', e => {
   if (e.key === ' ') control('toggle'); else if (e.key === 'ArrowRight') cycleTheme(1); else if (e.key === 'ArrowLeft') cycleTheme(-1);
   else if (e.key === 'Escape') uiBack();
 });
-uiBack = () => { if ($('.pop')) { closePops(); return true; } if ($('#voice.on')) { voice.stop(); return true; } if (devices.isOpen) { devices.hide(); return true; } if (lib.isOpen) { lib.back(); return true; } if ($('#sheet').classList.contains('on')) { openSheet(false); return true; } return false; };
+uiBack = () => { if ($('#linkAsk.on')) { $('#linkAsk [data-la="0"]').click(); return true; } if ($('.pop')) { closePops(); return true; } if ($('#voice.on')) { voice.stop(); return true; } if (devices.isOpen) { devices.hide(); return true; } if (lib.isOpen) { lib.back(); return true; } if ($('#sheet').classList.contains('on')) { openSheet(false); return true; } return false; };
 
 /* ---------- könyvtár: keresés, lejátszólisták, albumok, előadók ---------- */
 const lib = (() => {
@@ -2052,10 +2086,11 @@ function renderSheet() {
     <ol class="steps"><li><b>console.cloud.google.com</b> → új projekt.</li><li>APIs &amp; Services → Library → <b>YouTube Data API v3</b> → Enable.</li><li>Credentials → Create credentials → <b>API key</b>, és másold ide:</li></ol>
     <input class="tin" id="ytKey" placeholder="YouTube API kulcs" value="${esc(set.ytKey)}" autocomplete="off" spellcheck="false">
     <div class="acts"><button class="btn pri" data-ytsave>Mentés</button></div><div class="hint">Ingyenes; napi kb. 100 klipkeresésre elég (a találatokat a Halo megjegyzi).</div></div>
+  ${NATIVE && !S.tv ? `<h3>Kivetítés</h3><div class="hint">A Halo felületét a projektoron/TV-n futó Halo-ra küldheted: 📡 Eszközök → Kivetítés projektorra.</div>${tog('display', 'Kijelző mód ezen az eszközön', 'Ez az eszköz is fogadhat kivetítést (pl. a tablet a falon)')}` : ''}
   <h3>Forrás</h3>${NATIVE ? `<div class="status ${S.access ? 'ok' : ''}"><i></i>${S.access ? 'Értesítés-hozzáférés engedélyezve' : 'Nincs értesítés-hozzáférés'}</div>
     <div class="acts"><button class="btn ${S.access ? '' : 'pri'}" data-act="grant">Hozzáférés beállítása</button></div>`
     : `<div class="hint">Böngészős demó. Kipróbálhatod saját zenefájlokkal is (a fényperem ilyenkor a basszusra lüktet):</div><div class="acts"><button class="btn pri" data-audio>Saját zene betöltése</button></div>`}
-  <h3>Névjegy</h3><div class="hint">Halo Player 1.4 · Katalógus: iTunes Search · Dalszöveg: LRCLIB · Klipek: YouTube</div>`;
+  <h3>Névjegy</h3><div class="hint">Halo Player 1.5 · Katalógus: iTunes Search · Dalszöveg: LRCLIB · Klipek: YouTube</div>`;
   slInit(sheet);
 }
 sheet.addEventListener('click', async e => {
@@ -2087,6 +2122,7 @@ function applySettings(k) {
   if (k === 'beat') N('setBeat', !!set.beat);
   if (NATIVE && (!k || k === 'keepAwake')) N('setKeepAwake', !!set.keepAwake);
   if (k === 'voiceReply' && set.voiceReply) speak('Voice replies on');
+  if (NATIVE && !S.tv && (!k || k === 'display')) N('linkDisplay', !!set.display);
   if (k === 'vidOffset' || k === 'dim') applyBg();
   if (k && k.startsWith('lyr')) lyrics.refresh();
   if (!k || k === 'eco') N('setHighRefresh', !set.eco);
@@ -2155,7 +2191,7 @@ const DIC = {
   refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg>',
 };
 IC.cast = DIC.cast;
-const KIND_LABEL = { bluetooth: 'Bluetooth', cast: 'Chromecast', wired: 'Vezetékes', usb: 'USB', hdmi: 'HDMI', speaker: 'Beépített' };
+const KIND_LABEL = { display: 'Kivetítés', bluetooth: 'Bluetooth', cast: 'Chromecast', wired: 'Vezetékes', usb: 'USB', hdmi: 'HDMI', speaker: 'Beépített' };
 
 const devices = (() => {
   const el = $('#dev'), body = $('#devBody');
@@ -2172,7 +2208,8 @@ const devices = (() => {
     if (!open()) return;
     const o = st.output;
     let h = `<div class="now panel"><span class="ring">${devIcon(o.kind === 'cast' ? 'tv' : o.kind === 'speaker' ? 'phone' : o.kind)}</span><div><div class="k">MOST ITT SZÓL</div><div class="t">${esc(o.name)}</div><div class="a">${esc(KIND_LABEL[o.kind] || '')}${S.title ? ' · ' + esc(S.title) : ''}</div></div></div>`;
-    if (NATIVE) h += `<div class="dacts"><button class="btn" data-d="output">${DIC.output} Kimenet váltása</button><button class="btn" data-d="mirror">${DIC.mirror} Képernyő kivetítése</button><button class="btn" data-d="btset">${DIC.bluetooth} Bluetooth</button></div>`;
+    if (NATIVE) h += `<div class="dacts"><button class="btn" data-d="output">${DIC.output} Kimenet váltása</button><button class="btn" data-d="mirror">${DIC.mirror} Képernyőtükrözés</button><button class="btn" data-d="btset">${DIC.bluetooth} Bluetooth</button></div>`;
+    h += link.section();
     // Chromecast
     if (NATIVE) {
       h += `<h3>${DIC.cast} Chromecast és Google Cast ${st.casting ? '<button class="lnk" data-d="caststop">Leválasztás</button>' : ''}</h3>`;
@@ -2207,7 +2244,7 @@ const devices = (() => {
   }
   function show() {
     el.classList.add('on'); $('#scrim').classList.add('on'); app.classList.remove('idle');
-    if (NATIVE) N('devicesOpen');
+    if (NATIVE) { N('devicesOpen'); if (!S.tv) N('linkDiscover'); }
     render(); loadSp();
   }
   function hide() { el.classList.remove('on'); if (!lib.isOpen && !$('#sheet').classList.contains('on')) $('#scrim').classList.remove('on'); N('devicesClose'); }
@@ -2242,6 +2279,7 @@ const devices = (() => {
     if (d === 'btset') return N('btSettings');
     if (d === 'rescan') { N('devicesOpen'); return; }
     if (d === 'caststop') { N('castStop'); return; }
+    const lk = t.closest('[data-link]'); if (lk) return link.click(lk.dataset.link);
     const c = t.closest('[data-cast]'); if (c) { const r = st.casts.find(x => x.id === c.dataset.cast); if (r && !r.selected) castTo(r); return; }
     const sp = t.closest('[data-sp]'); if (sp) { try { await spotify.transfer(sp.dataset.sp); toastMsg('Átküldve ✓'); } catch (er) { toastMsg('Nem sikerült: ' + er.message); } return loadSp(); }
     const b = t.closest('[data-bt]'); if (b) { if (b.dataset.conn === '1') N('outputSwitcher'); else { toastMsg('Kapcsold be a hangszórót — a rendszer kimenetváltójában is választhatod'); N('outputSwitcher'); } return; }
@@ -2253,7 +2291,7 @@ const devices = (() => {
   function banner(ev) {
     const bn = $('#devBanner');
     const txt = { connected: 'Csatlakozva', disconnected: 'Leválasztva', paired: 'Párosítva', failed: 'Nem sikerült csatlakozni' }[ev.type] || ev.type;
-    const icon = ev.kind === 'cast' ? DIC.tv : ev.kind === 'bluetooth' ? DIC.bluetooth : ev.kind === 'wired' ? DIC.headphones : DIC.speaker;
+    const icon = ev.kind === 'cast' || ev.kind === 'display' ? DIC.tv : ev.kind === 'bluetooth' ? DIC.bluetooth : ev.kind === 'wired' ? DIC.headphones : DIC.speaker;
     bn.className = 'panel ' + ev.type; bn.innerHTML = `<span class="ring">${icon}</span><div><div class="k">${esc(KIND_LABEL[ev.kind] || 'Eszköz')} · ${esc(txt)}</div><div class="t">${esc(ev.name)}</div></div>`;
     void bn.offsetWidth; bn.classList.add('on'); S.flashAt = performance.now();
     clearTimeout(bT); bT = setTimeout(() => bn.classList.remove('on'), 3800);
@@ -2273,7 +2311,7 @@ const devices = (() => {
     b.innerHTML = show ? `<i>→</i>${devIcon(o.kind === 'cast' ? 'tv' : o.kind)}<span>${esc(o.name)}</span>` : '';
     b.classList.toggle('on', !!show);
   }
-  return { show, hide, get isOpen() { return open(); }, castTo, get state() { return st; }, castCurrent };
+  return { show, hide, get isOpen() { return open(); }, castTo, get state() { return st; }, castCurrent, refresh: render };
 })();
 
 /* ---- 61-voice.js ---- */
@@ -2392,6 +2430,174 @@ const voice = (() => {
   };
   return { start, stop, run };
 })();
+
+/* ---- 62-link.js ---- */
+/* ===== Halo Link: kivetítés telefonról/tabletről a projektoron futó Halo-ra (natív felbontásban) ===== */
+S.tv = NATIVE && !!N('isTV');
+if (S.tv) { app.classList.add('tv'); document.documentElement.classList.add('tv'); }
+
+const link = (() => {
+  let L = store.get('link', null);           // { host, port, key, name }
+  let on = !!(L && store.get('linkOn', false));
+  const found = new Map();
+  let fails = 0, busy = false, sentArt = '', sentQ = '', sentSet = '', connecting = '';
+
+  const SKEYS = ['theme', 'glowMode', 'preset', 'glowInt', 'thick', 'sparks', 'pulse', 'clock', 'h24', 'dim', 'blur', 'lyr', 'lyrStyle', 'lyrFont', 'lyrSize', 'lyrHl', 'lyrPos', 'lyrShade', 'videoBg', 'ytKey', 'vidOffset', 'minimal', 'country'];
+  function snap() { const o = {}; SKEYS.forEach(k => o[k] = set[k]); const bg = set.bgByTheme[set.theme] || 'auto'; o.bg = bg.startsWith('m:') ? 'album' : bg; return o; }
+
+  /* ---- küldő ---- */
+  async function tick() {
+    if (!on || !L || busy || S.tv) return; busy = true;
+    const body = { from: N('deviceName') || 'Telefon',
+      state: { title: S.title, artist: S.artist, album: S.album, duration: S.dur, position: Math.round(curPos()), playing: S.playing, speed: S.speed, pkg: S.pkg, app: srcInfo()[0], artKey: S.key } };
+    const ss = JSON.stringify(snap()); if (ss !== sentSet) { body.settings = JSON.parse(ss); N('linkSettings', ss); }
+    const ak = S.key + '|' + (S.art || '').length; if (S.art && ak !== sentArt) body.art = S.art;
+    const qs = S.queue.map(q => q.title).join('|') + '#' + S.history.length; if (qs !== sentQ) { body.queue = S.queue.slice(0, 10).map(q => ({ id: q.id, title: q.title, artist: q.artist, art: (q.art || '').length > 60000 ? '' : q.art })); body.history = S.history.slice(-8).map(h => ({ key: h.key, title: h.title, artist: h.artist, art: (h.art || '').length > 60000 ? '' : h.art })); }
+    try {
+      const r = await nfetch(`http://${L.host}:${L.port}/state`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Halo-Key': L.key }, body: JSON.stringify(body) });
+      if (r.status === 403) { stop(); toastMsg('A projektor nem fogadja a kapcsolatot — csatlakozz újra'); }
+      else if (r.ok) {
+        if (fails >= 3) Halo.onDeviceEvent({ type: 'connected', kind: 'display', name: L.name });
+        fails = 0; if (body.settings) sentSet = ss; if (body.art) sentArt = ak; if (body.queue) sentQ = qs;
+        for (const c of (r.json()?.cmds || [])) if (c && c.a) control(c.a, c.v);
+      } else throw new Error(r.status);
+    } catch {
+      if (++fails === 3) { Halo.onDeviceEvent({ type: 'disconnected', kind: 'display', name: L.name }); sentArt = sentQ = sentSet = ''; N('linkDiscover'); }
+    }
+    busy = false; paintChip();
+  }
+  setInterval(tick, 700);
+
+  async function connect(name) {
+    const d = found.get(name); if (!d || connecting) return;
+    connecting = name; render(); toastMsg('Erősítsd meg a projektoron a távirányító OK gombjával');
+    try {
+      const r = await nfetch(`http://${d.host}:${d.port}/hello`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: N('deviceName') || 'Telefon' }) });
+      if (!r.ok) throw new Error(r.status === 403 ? 'A projektoron elutasították' : 'A projektor nem válaszolt');
+      const j = r.json(); L = { host: d.host, port: d.port, key: j.key, name: d.name }; on = true; fails = 0; sentArt = sentQ = sentSet = '';
+      store.set('link', L); store.set('linkOn', true); native(true);
+      Halo.onDeviceEvent({ type: 'connected', kind: 'display', name: d.name }); tick();
+    } catch (e) { toastMsg(e.message || 'Nem sikerült csatlakozni'); }
+    connecting = ''; render(); paintChip();
+  }
+  function native(start) { if (start && L) { N('linkStart', L.host, L.port, L.key, L.name.replace(/^Halo · /, ''), N('deviceName') || 'Telefon'); N('linkSettings', JSON.stringify(snap())); } else N('linkStop'); }
+  function stop() { on = false; store.set('linkOn', false); native(false); if (L) Halo.onDeviceEvent({ type: 'disconnected', kind: 'display', name: L.name }); render(); paintChip(); }
+  function resume() { if (!L) return; on = true; fails = 0; sentArt = sentQ = sentSet = ''; store.set('linkOn', true); native(true); Halo.onDeviceEvent({ type: 'connected', kind: 'display', name: L.name }); render(); paintChip(); }
+  function render() { if (devices.isOpen) devices.refresh(); }
+  function paintChip() {
+    const b = $('#srcBadge .lnk'); if (!b) return;
+    const ok = on && L && fails < 3; b.classList.toggle('on', !!ok); b.innerHTML = ok ? `<i>⇢</i>${DIC.mirror}<span>${esc(L.name.replace(/^Halo · /, ''))}</span>` : '';
+  }
+  window.Halo.onLinkFound = d => {
+    if (typeof d === 'string') d = JSON.parse(d);
+    found.set(d.name, d);
+    if (L && d.name === L.name && (d.host !== L.host || d.port !== L.port)) { L.host = d.host; L.port = d.port; store.set('link', L); fails = 0; if (on) native(true); }
+    render();
+  };
+  window.Halo.onLinkLost = n => { found.delete(n); render(); };
+  if (NATIVE && on && !S.tv) setTimeout(() => { N('linkDiscover'); native(true); }, 1500);
+
+  /* panel-szakasz az Eszközök panelhez */
+  function section() {
+    if (!NATIVE || S.tv) return '';
+    let h = `<h3>${DIC.mirror} Kivetítés projektorra / TV-re</h3>`;
+    const names = new Set([...found.keys(), ...(L ? [L.name] : [])]);
+    if (!names.size) h += `<div class="hint"><span class="mini-spin"></span> Halo kijelzők keresése a Wi-Fi-n… Indítsd el a Halo-t a projektoron (ugyanazon a Wi-Fi-n).</div>`;
+    for (const n of names) {
+      const isL = L && n === L.name, live = isL && on && fails < 3, here = found.has(n);
+      const right = connecting === n ? '<span class="mini-spin"></span>' : live ? '<span class="go">Leállítás</span>' : '<span class="go">Kivetítés</span>';
+      h += `<div class="drow ${live ? 'on' : ''}" data-link="${esc(n)}"><span class="di">${DIC.tv}</span><div class="meta"><div class="t">${esc(n.replace(/^Halo · /, ''))}</div><div class="a">${live ? '<b class="ok">Kivetítve</b>' : here ? 'Halo kijelző · elérhető' : 'Nem elérhető most'}</div></div>${right}</div>`;
+    }
+    return h;
+  }
+  function click(n) { if (L && n === L.name && on && fails < 3) return stop(); if (L && n === L.name && !found.has(n)) return resume(); if (L && n === L.name && L.key) return resume(); connect(n); }
+  return { section, click, get on() { return on; }, paintChip };
+})();
+
+/* ---- fogadó (projektor / TV) ---- */
+const RKEYS = ['theme', 'glowMode', 'preset', 'glowInt', 'thick', 'sparks', 'pulse', 'clock', 'h24', 'dim', 'blur', 'lyr', 'lyrStyle', 'lyrFont', 'lyrSize', 'lyrHl', 'lyrPos', 'lyrShade', 'videoBg', 'ytKey', 'vidOffset', 'minimal', 'country'];
+function applyRemoteSettings(s) {
+  let theme = null, lyr = false;
+  for (const k of RKEYS) if (k in s && JSON.stringify(set[k]) !== JSON.stringify(s[k])) { if (k === 'theme') theme = s[k]; else { set[k] = s[k]; if (k.startsWith('lyr')) lyr = true; } }
+  if (s.bg) set.bgByTheme[s.theme || set.theme] = s.bg;
+  save();
+  if (theme && THEMES.some(t => t.id === theme)) mountTheme(theme); else { applyColors(); applyBg(); }
+  if (lyr) lyrics.refresh();
+  applySettings();
+}
+window.Halo.onRemote = o => {
+  if (typeof o === 'string') o = JSON.parse(o);
+  S.remoteAt = performance.now(); S.remoteFrom = o.from || 'Telefon';
+  if (o.settings) applyRemoteSettings(o.settings);
+  if (o.queue) S.queue = o.queue;
+  if (o.history) S.history = o.history;
+  if (o.state) { S.mode = 'remote'; const k0 = S.key; setTrack(o.state); if (S.key !== k0 && !o.art) setArt(''); }
+  if (o.art) setArt(o.art);
+  if (o.queue || o.history) paint(true);
+  $('#linkWait').classList.remove('on');
+};
+window.Halo.onLinkHello = (id, name) => {
+  const d = $('#linkAsk');
+  d.innerHTML = `<span class="ring">${DIC.phone}</span><div><div class="k">KIVETÍTÉS</div><div class="t">${esc(name)} csatlakozna</div><div class="acts"><button class="btn pri" data-la="1">Engedélyezés</button><button class="btn" data-la="0">Elutasítás</button></div></div>`;
+  d.dataset.id = id; d.classList.add('on'); app.classList.remove('idle');
+  setTimeout(() => $('[data-la="1"]', d).focus(), 60);
+};
+$('#linkAsk').addEventListener('click', e => { const b = e.target.closest('[data-la]'); if (!b) return; const d = $('#linkAsk'); N('linkAnswer', d.dataset.id, b.dataset.la === '1'); d.classList.remove('on'); });
+window.Halo.onKey = k => {
+  if (k === 'menu') return openSheet(!$('#sheet').classList.contains('on'));
+  control(k); toastHTML(`<b>${{ toggle: S.playing ? '⏸ Szünet' : '▶ Lejátszás', play: '▶ Lejátszás', pause: '⏸ Szünet', next: '⏭ Következő', prev: '⏮ Előző' }[k] || k}</b>`);
+};
+
+/* ---- távirányító (D-pad) a projektoron ---- */
+const FOCUSABLE = 'button:not([disabled]), input, .sl, .srow2, .drow, .acard, .row[data-q], .lcard, .tcard, .bgi, .sw, [data-la]';
+function spatial(dir) {
+  const scope = $('#linkAsk.on') || $('.overlay.on') || app;
+  const items = $$(FOCUSABLE, scope).filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && getComputedStyle(e).visibility !== 'hidden'; });
+  if (!items.length) return;
+  const cur = document.activeElement && items.includes(document.activeElement) ? document.activeElement : null;
+  if (!cur) { const first = items.find(e => e.matches('[data-act=toggle], [data-la="1"]')) || items[0]; first.tabIndex = first.tabIndex < 0 ? 0 : first.tabIndex; first.focus({ preventScroll: false }); return; }
+  const a = cur.getBoundingClientRect(), ax = a.left + a.width / 2, ay = a.top + a.height / 2;
+  let best = null, bs = Infinity;
+  for (const e of items) {
+    if (e === cur) continue; const b = e.getBoundingClientRect(), bx = b.left + b.width / 2, by = b.top + b.height / 2, dx = bx - ax, dy = by - ay;
+    const main = dir === 'ArrowRight' ? dx : dir === 'ArrowLeft' ? -dx : dir === 'ArrowDown' ? dy : -dy;
+    if (main <= 4) continue; const side = dir === 'ArrowRight' || dir === 'ArrowLeft' ? Math.abs(dy) : Math.abs(dx);
+    const sc = main + side * 2.2; if (sc < bs) { bs = sc; best = e; }
+  }
+  if (best) { if (!best.matches('button, input')) best.tabIndex = -1; best.focus(); best.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+}
+if (S.tv) addEventListener('keydown', e => {
+  const k = e.key, ae = document.activeElement;
+  if (ae && ae.matches('input[type=search], input.tin, #askIn') && (k === 'ArrowLeft' || k === 'ArrowRight')) return;
+  const layer = $('#linkAsk.on') || $('.overlay.on');
+  if (ae && ae.classList.contains('sl') && (k === 'ArrowLeft' || k === 'ArrowRight')) {
+    const st = +ae.dataset.step, v = clamp(+ae.dataset.v + (k === 'ArrowRight' ? st : -st) * (ae.dataset.unit === '%' ? 5 : 2), +ae.dataset.min, +ae.dataset.max);
+    const r = ae.querySelector('.tr').getBoundingClientRect(); slSet(ae, r.left + (v - ae.dataset.min) / (ae.dataset.max - ae.dataset.min) * r.width + 0.5);
+    e.preventDefault(); e.stopImmediatePropagation(); return;
+  }
+  if (k.startsWith('Arrow')) {
+    if (layer || !app.classList.contains('idle') && ae && ae !== document.body) spatial(k);
+    else if (k === 'ArrowLeft') Halo.onKey('prev'); else if (k === 'ArrowRight') Halo.onKey('next');
+    else { cycleTheme(k === 'ArrowUp' ? -1 : 1); }
+    e.preventDefault(); e.stopImmediatePropagation(); wake(); return;
+  }
+  if (k === 'Enter' || k === ' ') {
+    if (ae && ae !== document.body && (layer || !app.classList.contains('idle'))) { ae.click(); }
+    else { app.classList.remove('idle'); spatial('ArrowDown'); }
+    e.preventDefault(); e.stopImmediatePropagation(); wake();
+  }
+}, true);
+
+/* várakozó képernyő a projektoron */
+function linkWaitCheck() {
+  const w = $('#linkWait'); if (!S.tv) return;
+  const show = S.mode !== 'remote' && !S.title;
+  if (show && !w.innerHTML) w.innerHTML = `<div class="k">HALO KIJELZŐ</div><h2>Várakozás a telefonra…</h2>
+    <ol><li>Legyen a telefon és a projektor <b>ugyanazon a Wi-Fi-n</b>.</li><li>A telefonon: Halo → <b>📡 Eszközök</b> → <b>Kivetítés projektorra</b> → <b>${esc(N('deviceName') || 'ez a projektor')}</b>.</li><li>Itt nyomd meg az <b>OK</b> gombot az engedélyezéshez.</li></ol>
+    <div class="keys"><span><b>OK</b> lejátszás/szünet</span><span><b>◀ ▶</b> előző/következő</span><span><b>▲ ▼</b> téma</span><span><b>☰</b> beállítások</span></div>`;
+  w.classList.toggle('on', show);
+}
+setInterval(linkWaitCheck, 1000); setTimeout(linkWaitCheck, 300);
 
 })();</script>
 </body>

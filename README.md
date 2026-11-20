@@ -35,6 +35,21 @@ keresés és lejátszólisták.
   „volume up / volume 40”, „shuffle”, „show lyrics”, „neon lyrics”, „next theme”, „what's playing”,
   „open devices”, „cast to <eszköz>” — angol hangos visszajelzéssel.
 
+## Kivetítés projektorra / Google TV-re (Halo Link)
+
+A telefon/tablet Halo-ja elküldi a felületét a projektoron futó Halo-nak a helyi Wi-Fi-n. A projektor a
+saját felbontásán rajzolja ki ugyanazt a skint (nem tömörített képernyőtükrözés), a telefon téma- és
+dalszöveg-beállításait követi, a távirányítóval pedig vezérelhető a telefonon szóló zene.
+
+1. Telepítsd az APK-t a projektorra (pl. a „Send Files to TV” appal; a projektoron: Beállítások →
+   Alkalmazások → Biztonság → Ismeretlen források engedélyezése a fájlkezelőnek).
+2. Indítsd el a Halo-t a projektoron — „Várakozás a telefonra…” képernyő jelenik meg.
+3. A telefonon: Halo → 📡 Eszközök → **Kivetítés projektorra** → a projektor neve.
+4. A projektoron nyomd meg az **OK** gombot az engedélyezéshez.
+
+Távirányító a projektoron: OK = lejátszás/szünet, ◀ ▶ = előző/következő dal, ▲ ▼ = téma, ☰ = beállítások.
+Ha a telefonon közben más app van előtérben, egy háttérszolgáltatás („Kivetítés aktív” értesítés) küld tovább.
+
 ## Fiókok beállítása (az appban: ⚙ → Fiókok)
 
 **Spotify:** developer.spotify.com/dashboard → Create app → Redirect URI: `http://127.0.0.1:43821/callback`

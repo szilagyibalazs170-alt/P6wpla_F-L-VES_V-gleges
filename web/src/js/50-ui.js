@@ -83,7 +83,7 @@ function paint(lists = false, artChanged = false) {
   $$('[data-act=lyrics]').forEach(e => e.classList.toggle('on', set.lyr));
   $$('[data-act=shuffle],[data-act=repeat]').forEach(e => e.classList.toggle('dis', S.mode === 'native' && !S.canShuffle && !S.canRepeat));
   app.classList.toggle('minimal', !!set.minimal);
-  $('#onboard').classList.toggle('on', NATIVE && !S.access);
+  $('#onboard').classList.toggle('on', NATIVE && !S.access && !S.tv);
   if (artChanged) markCurAlbum();
   if (lists || artChanged) { renderQueue(); flow.render(); renderAlbumRows(); }
 }
@@ -234,7 +234,7 @@ const glow = (() => {
   const cv = $('#glow'), ctx = cv.getContext('2d');
   let w = 0, h = 0, sc = 0.5, parts = [], lastSpawn = 0, ph = 0, lt = 0;
   const api = { colors: ['#ff4fa3', '#ff9a4d'] };
-  function resize() { sc = innerWidth * innerHeight > 1.2e6 ? 0.42 : 0.55; w = cv.width = Math.round(innerWidth * sc); h = cv.height = Math.round(innerHeight * sc); }
+  function resize() { sc = (innerWidth * innerHeight > 1.2e6 ? 0.42 : 0.55) * (S.tv ? Math.min(2, devicePixelRatio || 1) : 1); w = cv.width = Math.round(innerWidth * sc); h = cv.height = Math.round(innerHeight * sc); }
   addEventListener('resize', resize); resize();
   const n = (u, t) => 0.5 + 0.5 * (0.5 * Math.sin(u * 5.1 + t * 1.2) + 0.3 * Math.sin(u * 11.7 - t * 1.9) + 0.2 * Math.sin(u * 23.3 + t * 3.1));
   function edge(len, depth, t, seed, map) {
@@ -396,7 +396,7 @@ addEventListener('keydown', e => {
   if (e.key === ' ') control('toggle'); else if (e.key === 'ArrowRight') cycleTheme(1); else if (e.key === 'ArrowLeft') cycleTheme(-1);
   else if (e.key === 'Escape') uiBack();
 });
-uiBack = () => { if ($('.pop')) { closePops(); return true; } if ($('#voice.on')) { voice.stop(); return true; } if (devices.isOpen) { devices.hide(); return true; } if (lib.isOpen) { lib.back(); return true; } if ($('#sheet').classList.contains('on')) { openSheet(false); return true; } return false; };
+uiBack = () => { if ($('#linkAsk.on')) { $('#linkAsk [data-la="0"]').click(); return true; } if ($('.pop')) { closePops(); return true; } if ($('#voice.on')) { voice.stop(); return true; } if (devices.isOpen) { devices.hide(); return true; } if (lib.isOpen) { lib.back(); return true; } if ($('#sheet').classList.contains('on')) { openSheet(false); return true; } return false; };
 
 /* ---------- könyvtár: keresés, lejátszólisták, albumok, előadók ---------- */
 const lib = (() => {
@@ -633,10 +633,11 @@ function renderSheet() {
     <ol class="steps"><li><b>console.cloud.google.com</b> → új projekt.</li><li>APIs &amp; Services → Library → <b>YouTube Data API v3</b> → Enable.</li><li>Credentials → Create credentials → <b>API key</b>, és másold ide:</li></ol>
     <input class="tin" id="ytKey" placeholder="YouTube API kulcs" value="${esc(set.ytKey)}" autocomplete="off" spellcheck="false">
     <div class="acts"><button class="btn pri" data-ytsave>Mentés</button></div><div class="hint">Ingyenes; napi kb. 100 klipkeresésre elég (a találatokat a Halo megjegyzi).</div></div>
+  ${NATIVE && !S.tv ? `<h3>Kivetítés</h3><div class="hint">A Halo felületét a projektoron/TV-n futó Halo-ra küldheted: 📡 Eszközök → Kivetítés projektorra.</div>${tog('display', 'Kijelző mód ezen az eszközön', 'Ez az eszköz is fogadhat kivetítést (pl. a tablet a falon)')}` : ''}
   <h3>Forrás</h3>${NATIVE ? `<div class="status ${S.access ? 'ok' : ''}"><i></i>${S.access ? 'Értesítés-hozzáférés engedélyezve' : 'Nincs értesítés-hozzáférés'}</div>
     <div class="acts"><button class="btn ${S.access ? '' : 'pri'}" data-act="grant">Hozzáférés beállítása</button></div>`
     : `<div class="hint">Böngészős demó. Kipróbálhatod saját zenefájlokkal is (a fényperem ilyenkor a basszusra lüktet):</div><div class="acts"><button class="btn pri" data-audio>Saját zene betöltése</button></div>`}
-  <h3>Névjegy</h3><div class="hint">Halo Player 1.4 · Katalógus: iTunes Search · Dalszöveg: LRCLIB · Klipek: YouTube</div>`;
+  <h3>Névjegy</h3><div class="hint">Halo Player 1.5 · Katalógus: iTunes Search · Dalszöveg: LRCLIB · Klipek: YouTube</div>`;
   slInit(sheet);
 }
 sheet.addEventListener('click', async e => {
@@ -668,6 +669,7 @@ function applySettings(k) {
   if (k === 'beat') N('setBeat', !!set.beat);
   if (NATIVE && (!k || k === 'keepAwake')) N('setKeepAwake', !!set.keepAwake);
   if (k === 'voiceReply' && set.voiceReply) speak('Voice replies on');
+  if (NATIVE && !S.tv && (!k || k === 'display')) N('linkDisplay', !!set.display);
   if (k === 'vidOffset' || k === 'dim') applyBg();
   if (k && k.startsWith('lyr')) lyrics.refresh();
   if (!k || k === 'eco') N('setHighRefresh', !set.eco);

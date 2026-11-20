@@ -165,6 +165,12 @@ const lp = (() => {
 
 /* ----- vezérlés: a forrás szerint ----- */
 function control(a, v) {
+  if (S.mode === 'remote') {
+    N('linkQueue', JSON.stringify({ a, v: v ?? '' }));
+    if (a === 'toggle') a = S.playing ? 'pause' : 'play';
+    if (a === 'play' || a === 'pause') { S.pos = curPos(); S.at = performance.now(); S.playing = a === 'play'; app.classList.toggle('paused', !S.playing); hooks.paint(); }
+    return;
+  }
   if (lp.active) return lp.control(a, v);
   if (a === 'toggle') a = S.playing ? 'pause' : 'play';
   if (a === 'play' || a === 'pause') { S.pos = curPos(); S.at = performance.now(); S.playing = a === 'play'; app.classList.toggle('paused', !S.playing); hooks.paint(); }
@@ -214,6 +220,7 @@ let toastMsg = () => {};
 window.Halo = {
   onState(o) {
     if (typeof o === 'string') o = JSON.parse(o);
+    if (S.mode === 'remote' && performance.now() - (S.remoteAt || 0) < 8000) return;
     if (lp.active && NATIVE) { if (!o.playing) return; lp.stop(); }
     S.mode = 'native'; setTrack(o);
   },

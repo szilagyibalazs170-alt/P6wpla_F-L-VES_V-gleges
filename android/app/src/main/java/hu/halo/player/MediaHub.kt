@@ -41,6 +41,9 @@ object MediaHub {
     private var lastArtKey = ""
     private var lastArtHadBitmap = false
     private var lastQueueSig = ""
+    @Volatile var lastArtData: String? = null
+    @Volatile var lastArtDataKey = ""
+    @Volatile var lastQueueJson: String? = null
 
     private val sessionsListener = MediaSessionManager.OnActiveSessionsChangedListener { list ->
         pick(list ?: emptyList())
@@ -115,6 +118,20 @@ object MediaHub {
         push(); pushQueue()
     }
 
+    /** Friss állapot (pozícióval) a kivetítéshez. */
+    fun snapshot(): JSONObject? {
+        val c = current ?: return null
+        val md = c.metadata; val st = c.playbackState
+        val playing = st?.state == PlaybackState.STATE_PLAYING || st?.state == PlaybackState.STATE_BUFFERING
+        var pos = st?.position ?: 0L
+        if (playing && st != null && st.lastPositionUpdateTime > 0) pos += ((SystemClock.elapsedRealtime() - st.lastPositionUpdateTime) * st.playbackSpeed).toLong()
+        val title = md?.getString(MediaMetadata.METADATA_KEY_TITLE) ?: md?.getString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE) ?: ""
+        val artist = md?.getString(MediaMetadata.METADATA_KEY_ARTIST) ?: md?.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST) ?: ""
+        return JSONObject().put("title", title).put("artist", artist).put("album", md?.getString(MediaMetadata.METADATA_KEY_ALBUM) ?: "")
+            .put("duration", md?.getLong(MediaMetadata.METADATA_KEY_DURATION) ?: 0L).put("position", pos).put("playing", playing)
+            .put("speed", 1.0).put("pkg", c.packageName).put("app", appLabel(c.packageName)).put("artKey", "$title|$artist")
+    }
+
     private fun push() {
         val c = current ?: return
         val md = c.metadata
@@ -155,7 +172,7 @@ object MediaHub {
                 val data = (bmp ?: uri?.let { loadUri(it) })?.let { toDataUrl(it, 640, 88) }
                 main.post {
                     if (lastArtKey != artKey) return@post
-                    if (data != null) js("Halo.onArt(${JSONObject.quote(artKey)},${JSONObject.quote(data)})")
+                    if (data != null) { lastArtData = data; lastArtDataKey = artKey; js("Halo.onArt(${JSONObject.quote(artKey)},${JSONObject.quote(data)})") }
                     else js("Halo.onNoArt(${JSONObject.quote(artKey)})")
                 }
             }
@@ -182,6 +199,7 @@ object MediaHub {
                     .put("artist", d.subtitle?.toString() ?: "")
                     .put("art", icon?.let { toDataUrl(it, 200, 80) } ?: ""))
             }
+            lastQueueJson = arr.toString()
             main.post { if (lastQueueSig == sig) js("Halo.onQueue($arr)") }
         }
     }
@@ -189,6 +207,7 @@ object MediaHub {
     fun control(action: String, value: String) {
         val t = current?.transportControls ?: return
         when (action) {
+            "toggle" -> if (current?.playbackState?.state == PlaybackState.STATE_PLAYING) t.pause() else t.play()
             "play" -> t.play()
             "pause" -> t.pause()
             "next" -> t.skipToNext()
