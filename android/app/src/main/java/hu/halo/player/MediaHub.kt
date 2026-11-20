@@ -231,6 +231,18 @@ object MediaHub {
 
     fun pauseExternal() { current?.transportControls?.pause() }
 
+    private fun simple(s: String) = s.lowercase().replace(Regex("\\s*[(\\[].*?[)\\]]"), "").replace(Regex("[^\\p{L}\\p{N}]+"), "")
+
+    /** Az adott app épp a kért dalt játssza-e (laza egyezés a címre). */
+    fun isPlaying(pkg: String, title: String): Boolean {
+        val list = try { msm?.getActiveSessions(comp) } catch (e: SecurityException) { null } ?: return false
+        val want = simple(title).take(14); if (want.isEmpty()) return false
+        return list.any { c ->
+            c.packageName == pkg && c.playbackState?.state == PlaybackState.STATE_PLAYING &&
+                simple(c.metadata?.getString(MediaMetadata.METADATA_KEY_TITLE) ?: "").let { it.isNotEmpty() && (it.startsWith(want) || want.startsWith(it.take(14))) }
+        }
+    }
+
     fun currentPackage(): String = current?.packageName ?: ""
 
     fun openSource(ctx: Context) {

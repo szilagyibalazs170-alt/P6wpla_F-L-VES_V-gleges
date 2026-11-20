@@ -118,7 +118,7 @@ const spotify = (() => {
           if (!dev) throw e;
           await api('/me/player/play?device_id=' + dev.id, { method: 'PUT', body }); return true;
         }
-      } catch { if (fallbackUri) N('openUri', fallbackUri); return false; }
+      } catch { return false; }
     },
   };
 })();

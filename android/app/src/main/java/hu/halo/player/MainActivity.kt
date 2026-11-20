@@ -231,6 +231,33 @@ class MainActivity : Activity() {
         }
     }
 
+    private var playSeq = 0
+
+    private fun playResult(ok: Boolean, via: String) =
+        web.evaluateJavascript("window.Halo&&Halo.onPlayResult&&Halo.onPlayResult($ok,'$via')", null)
+
+    /** Elindítja a dalt a zenei appban, majd megpróbál visszahozni a Halo-ra, amint a dal szól. */
+    private fun launchPlayIntent(pkg: String, q: String, ex: Bundle, title: String, seq: Int) {
+        val i = Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH).setPackage(pkg)
+            .putExtras(ex).putExtra(SearchManager.QUERY, q).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try { startActivity(i) } catch (_: ActivityNotFoundException) {
+            web.evaluateJavascript("window.Halo&&Halo.toastMsg('Az app nincs telepítve ezen az eszközön')", null)
+            playResult(false, "missing"); return
+        }
+        var tries = 0
+        val back = object : Runnable {
+            override fun run() {
+                if (seq != playSeq || resumed) return
+                MediaHub.refreshSessions()
+                if (MediaHub.isPlaying(pkg, title) || ++tries >= 8) {
+                    try { startActivity(Intent(this@MainActivity, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP)) } catch (_: Exception) { }
+                    playResult(MediaHub.isPlaying(pkg, title), "intent")
+                } else main.postDelayed(this, 700)
+            }
+        }
+        main.postDelayed(back, 1500)
+    }
+
     private fun openUri(uri: String) {
         try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) { }
     }
@@ -367,12 +394,18 @@ class MainActivity : Activity() {
                 if (album.isNotBlank()) putString(MediaStore.EXTRA_MEDIA_ALBUM, album)
                 putString(SearchManager.QUERY, q)
             }
-            if (MediaHub.playFromSearch(pkg, q, ex)) return@runOnUiThread
-            val i = Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH).setPackage(pkg)
-                .putExtras(ex).putExtra(SearchManager.QUERY, q).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            try { startActivity(i) } catch (_: ActivityNotFoundException) {
-                web.evaluateJavascript("window.Halo&&Halo.toastMsg('Az app nincs telepítve')", null)
+            val seq = ++playSeq
+            // 1) ha az app már fut: a médiamenetén keresztül (nem kell appot váltani) — majd ellenőrizzük
+            if (MediaHub.playFromSearch(pkg, q, ex)) {
+                main.postDelayed({
+                    if (seq != playSeq) return@postDelayed
+                    if (MediaHub.isPlaying(pkg, title)) playResult(true, "session")
+                    else launchPlayIntent(pkg, q, ex, title, seq)
+                }, 2600)
+                return@runOnUiThread
             }
+            // 2) különben a hivatalos „lejátszás keresésből” paranccsal
+            launchPlayIntent(pkg, q, ex, title, seq)
         }
 
         /** Kép letöltése data URL-ként (színkinyeréshez); eredmény: Halo.onHttp(id, 200, dataUrl). */

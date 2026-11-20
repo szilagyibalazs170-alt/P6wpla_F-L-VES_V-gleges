@@ -197,20 +197,26 @@ async function playItem(it, list) {
       if (uri) {
         const uris = list.map(x => x.spUri).filter(Boolean);
         const body = it.spUri && uris.length > 1 ? { uris: uris.slice(0, 100), offset: { uri } } : { uris: [uri] };
-        if (await spotify.play(body, uri)) toastMsg('Lejátszás a Spotify-on');
-        return;
+        if (await spotify.play(body)) { playPending(it, 'spotify-api'); return; }
       }
     } catch {}
   }
-  N('playFromSearch', PKG[via] || PKG.spotify, it.title || '', String(it.artist || ''), it.album || '');
-  toastMsg('Indítás: ' + SRC[PKG[via] || PKG.spotify][0]);
+  let tt = it.title || '', aa = String(it.artist || '');
+  if (it.kind === 'video' && / [-–] /.test(tt)) { const p = tt.split(/ [-–] /); aa = p[0]; tt = p.slice(1).join(' '); }
+  tt = tt.replace(/\s*[([](official|lyric|audio|video|visualizer|hd|4k)[^)\]]*[)\]]/gi, '').trim();
+  N('playFromSearch', PKG[via] || PKG.spotify, tt, aa.split(/,|&| feat| x /i)[0].trim(), it.album || '');
+  playPending(it, 'search');
+}
+let playWait = null;
+function playPending(it, how) {
+  playWait = { title: norm(it.title), at: performance.now() };
+  toastHTML(`<span class="mini-spin"></span> <b>${esc(it.title)}</b> · indítás: ${esc(SRC[PKG[set.playVia] || PKG.spotify][0])}…`);
 }
 async function playContext(pl, it, tracks) {
   if (NATIVE && set.playVia === 'spotify' && spotify.connected && pl.uri) {
     lp.stop();
     const body = { context_uri: pl.uri, ...(it?.spUri ? { offset: { uri: it.spUri } } : {}) };
-    if (await spotify.play(body, it?.spUri || pl.uri)) toastMsg('Lejátszás a Spotify-on');
-    return;
+    if (await spotify.play(body)) { toastMsg('Lejátszás a Spotify-on'); return; }
   }
   playItem(it || tracks[0], tracks);
 }
@@ -223,6 +229,7 @@ window.Halo = {
     if (S.mode === 'remote' && performance.now() - (S.remoteAt || 0) < 8000) return;
     if (lp.active && NATIVE) { if (!o.playing) return; lp.stop(); }
     S.mode = 'native'; setTrack(o);
+    if (playWait && o.playing && norm(o.title).slice(0, 12) === playWait.title.slice(0, 12)) { toastHTML(`<b>▶ ${esc(o.title)}</b> · ${esc(o.artist)}`); playWait = null; }
   },
   onArt(key, url) { if (S.mode === 'native' && (!key || key === S.artKey)) setArt(url); },
   onNoArt(key) { if (S.mode === 'native' && (!key || key === S.artKey)) setArt(''); },
@@ -232,6 +239,7 @@ window.Halo = {
   onHttp(id, status, body) { const p = pend.get(id); if (!p) return; pend.delete(id); p.res({ status, text: body, ok: status >= 200 && status < 300, json: () => JSON.parse(body || 'null') }); },
   onAuth(url) { spotify.onAuth(url).then(() => { toastMsg('Spotify összekapcsolva ✓'); hooks.paint(true); }).catch(e => toastMsg(e.message)); },
   onLevel(v) { S.level = v; S.levelAt = performance.now(); },
+  onPlayResult(ok, via) { if (!playWait) return; if (!ok) toastMsg(via === 'missing' ? 'Az app nincs telepítve' : 'Nem sikerült elindítani — nyisd meg az appot, és próbáld újra'); playWait = null; },
   onBeat(ok) { S.beatOk = !!ok; if (!ok) { set.beat = false; save(); toastMsg('Az ütemkövetés nem érhető el ezen a készüléken'); } },
   back() { return uiBack(); },
   toastMsg(m) { toastMsg(m); },

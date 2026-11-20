@@ -637,7 +637,7 @@ function renderSheet() {
   <h3>Forrás</h3>${NATIVE ? `<div class="status ${S.access ? 'ok' : ''}"><i></i>${S.access ? 'Értesítés-hozzáférés engedélyezve' : 'Nincs értesítés-hozzáférés'}</div>
     <div class="acts"><button class="btn ${S.access ? '' : 'pri'}" data-act="grant">Hozzáférés beállítása</button></div>`
     : `<div class="hint">Böngészős demó. Kipróbálhatod saját zenefájlokkal is (a fényperem ilyenkor a basszusra lüktet):</div><div class="acts"><button class="btn pri" data-audio>Saját zene betöltése</button></div>`}
-  <h3>Névjegy</h3><div class="hint">Halo Player 1.5 · Katalógus: iTunes Search · Dalszöveg: LRCLIB · Klipek: YouTube</div>`;
+  <h3>Névjegy</h3><div class="hint">Halo Player 1.5.1 · Katalógus: iTunes Search · Dalszöveg: LRCLIB · Klipek: YouTube</div>`;
   slInit(sheet);
 }
 sheet.addEventListener('click', async e => {
