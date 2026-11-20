@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <!-- izzó gyűrű -->
+    <path android:pathData="M54,30a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z"
+        android:strokeWidth="5" android:fillColor="#00000000" android:strokeColor="#FF4FA3" android:strokeAlpha="0.35" />
+    <path android:pathData="M54,30a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z"
+        android:strokeWidth="2.6" android:fillColor="#00000000" android:strokeColor="#FF7AB8" />
+    <!-- hangjegy -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M41,64a5,5 0,1 0,10 0a5,5 0,1 0,-10 0z M57,60a5,5 0,1 0,10 0a5,5 0,1 0,-10 0z M49,44h3v20h-3z M65,40h3v20h-3z M49,40L68,35.5V41.5L49,46z" />
+</vector>
