@@ -28,6 +28,12 @@ keresés és lejátszólisták.
   betűtípus, méret, kiemelés színe, elhelyezés állítható.
 - **Háttér:** a dal videóklipje (YouTube Data API kulccsal), albumborító, Aurora, vagy saját videó/kép.
 - **Fényperem:** a borító színeiből, ütemre lüktet (opcionálisan valódi hangelemzéssel).
+- **Eszközök:** Chromecast / Google Cast felderítés és küldés (Spotify Connect-en át, vagy a Halo előzeteseinél
+  Cast SDK-val), Spotify Connect eszközváltás, Bluetooth-hangszórók keresése és párosítása, animált jelzés
+  csatlakozáskor/leválasztáskor, rendszer-kimenetváltó és képernyő-kivetítés.
+- **Hangvezérlés (angol):** „next song”, „previous”, „pause”, „play <dal> by <előadó>”, „search <név>”,
+  „volume up / volume 40”, „shuffle”, „show lyrics”, „neon lyrics”, „next theme”, „what's playing”,
+  „open devices”, „cast to <eszköz>” — angol hangos visszajelzéssel.
 
 ## Fiókok beállítása (az appban: ⚙ → Fiókok)
 

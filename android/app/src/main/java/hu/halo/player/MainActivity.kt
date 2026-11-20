@@ -92,6 +92,8 @@ class MainActivity : Activity() {
         setContentView(web)
         MediaHub.emit = { code -> if (pageReady) web.evaluateJavascript(code, null) }
         Beat.onLevel = { lvl -> main.post { if (pageReady) web.evaluateJavascript("window.Halo&&Halo.onLevel($lvl)", null) } }
+        Devices.emit = { code -> main.post { if (pageReady) web.evaluateJavascript(code, null) } }
+        Voice.emit = { code -> main.post { if (pageReady) web.evaluateJavascript(code, null) } }
         applyRefresh(true)
         handleIntent(intent)
         web.loadUrl("https://appassets.androidplatform.net/assets/index.html")
@@ -136,6 +138,12 @@ class MainActivity : Activity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, results: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, results)
+        if (requestCode == REQ_BT) { Devices.startScan(results.isNotEmpty() && results.all { it == PackageManager.PERMISSION_GRANTED }); return }
+        if (requestCode == REQ_VOICE) {
+            if (results.firstOrNull() == PackageManager.PERMISSION_GRANTED) Voice.start(this)
+            else web.evaluateJavascript("window.Halo&&Halo.onVoice({error:'perm'})", null)
+            return
+        }
         if (requestCode == REQ_AUDIO) {
             val ok = results.firstOrNull() == PackageManager.PERMISSION_GRANTED && Beat.start()
             web.evaluateJavascript("window.Halo&&Halo.onBeat($ok)", null)
@@ -171,6 +179,10 @@ class MainActivity : Activity() {
 
     override fun onDestroy() {
         MediaHub.emit = null
+        Devices.emit = null
+        Devices.stopScan()
+        Voice.emit = null
+        Voice.shutdown()
         AuthServer.stop()
         Beat.onLevel = null
         Beat.stop()
@@ -228,12 +240,40 @@ class MainActivity : Activity() {
         @JavascriptInterface fun ready() = runOnUiThread {
             pageReady = true
             MediaHub.attach(this@MainActivity)
+            try { Devices.init(this@MainActivity); Devices.push() } catch (_: Exception) { }
             flushAuth()
         }
         /** Spotify bejelentkezés előtt: elindítja a helyi fogadót (http://127.0.0.1:43821/callback). */
         @JavascriptInterface fun authListen() { AuthServer.start { url -> main.post { deliverAuth(url) } } }
         @JavascriptInterface fun redirectUri(): String = AuthServer.REDIRECT
         @JavascriptInterface fun setHighRefresh(on: Boolean) = runOnUiThread { applyRefresh(on) }
+
+        /* ---- eszközök: Bluetooth, Chromecast, kimenet ---- */
+        @JavascriptInterface fun devicesOpen() = runOnUiThread {
+            val perms = if (Build.VERSION.SDK_INT >= 31) arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+                else arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+            val missing = perms.filter { checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }
+            if (missing.isEmpty()) Devices.startScan(true) else requestPermissions(missing.toTypedArray(), REQ_BT)
+        }
+        @JavascriptInterface fun devicesRescan() = runOnUiThread { Devices.startScan(true) }
+        @JavascriptInterface fun devicesClose() = runOnUiThread { Devices.stopScan() }
+        @JavascriptInterface fun btPair(address: String) = runOnUiThread { Devices.pair(address) }
+        @JavascriptInterface fun btSettings() = runOnUiThread { Devices.openBtSettings(this@MainActivity) }
+        @JavascriptInterface fun castSelect(id: String) = runOnUiThread { Devices.castSelect(id) }
+        @JavascriptInterface fun castStop() = runOnUiThread { Devices.castStop() }
+        @JavascriptInterface fun castLoad(url: String, title: String, artist: String, art: String) = runOnUiThread { Devices.castLoad(url, title, artist, art) }
+        @JavascriptInterface fun castControl(a: String, v: String) = runOnUiThread { Devices.castControl(a, v.toLongOrNull() ?: 0L) }
+        @JavascriptInterface fun isCasting(): Boolean = Devices.casting
+        @JavascriptInterface fun outputSwitcher() = runOnUiThread { Devices.openOutputSwitcher(this@MainActivity, MediaHub.currentPackage()) }
+        @JavascriptInterface fun mirror() = runOnUiThread { Devices.openMirroring(this@MainActivity) }
+
+        /* ---- hangvezérlés (angol) ---- */
+        @JavascriptInterface fun voiceStart() = runOnUiThread {
+            if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) Voice.start(this@MainActivity)
+            else requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), REQ_VOICE)
+        }
+        @JavascriptInterface fun voiceStop() = runOnUiThread { Voice.stop() }
+        @JavascriptInterface fun speak(text: String) = runOnUiThread { Voice.speak(this@MainActivity, text) }
         @JavascriptInterface fun control(action: String, value: String) = runOnUiThread { MediaHub.control(action, value) }
         @JavascriptInterface fun openNotificationAccess() = runOnUiThread { this@MainActivity.openNotificationAccess() }
         @JavascriptInterface fun openSource() = runOnUiThread { MediaHub.openSource(this@MainActivity) }
@@ -320,5 +360,7 @@ class MainActivity : Activity() {
     companion object {
         private const val REQ_FILE = 42
         private const val REQ_AUDIO = 43
+        private const val REQ_BT = 44
+        private const val REQ_VOICE = 45
     }
 }

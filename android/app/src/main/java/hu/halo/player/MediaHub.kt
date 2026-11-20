@@ -212,6 +212,8 @@ object MediaHub {
 
     fun pauseExternal() { current?.transportControls?.pause() }
 
+    fun currentPackage(): String = current?.packageName ?: ""
+
     fun openSource(ctx: Context) {
         val c = current ?: return
         try {

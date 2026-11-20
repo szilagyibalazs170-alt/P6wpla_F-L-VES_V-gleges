@@ -19,7 +19,7 @@ const N = (m, ...a) => { try { return NATIVE ? HaloNative[m](...a) : undefined; 
 
 const DEF = {
   theme: 'albums', glowMode: 'auto', preset: 0, glowInt: 0.9, thick: 1, sparks: true, pulse: true, beat: false,
-  clock: true, h24: true, dim: 0.28, blur: true, lyr: false, lyrStyle: 'kinetic', lyrFont: 'auto', lyrSize: 1, lyrHl: 'gold', lyrPos: 'auto', lyrShade: false, eco: false, bgByTheme: {}, keepAwake: true,
+  clock: true, h24: true, dim: 0.28, blur: true, lyr: false, lyrStyle: 'kinetic', lyrFont: 'auto', lyrSize: 1, lyrHl: 'gold', lyrPos: 'auto', lyrShade: false, voiceReply: true, eco: false, bgByTheme: {}, keepAwake: true,
   videoBg: true, ytKey: '', spClient: '', playVia: 'spotify', country: 'US', minimal: false, vidOffset: 0,
 };
 const set = Object.assign({}, DEF, store.get('set', {}));
@@ -125,6 +125,8 @@ const IC = {
   heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7-4.4-9.2-8.6C1.2 8.3 3.1 4.5 6.7 4.5c2.1 0 3.4 1.2 4.1 2.4h.4c.7-1.2 2-2.4 4.1-2.4 3.6 0 5.5 3.8 3.9 6.9C19 15.6 12 20 12 20z"/></svg>',
   theme: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
   gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>',
+  cast: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/><path d="M2 20h.01"/></svg>',
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></svg>',
   library: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4v16M9 4v16M14 4l6 16"/></svg>',
 };
 const ib = (act, cls = '', title = '') => `<button class="ib ${cls}" data-act="${act}" ${title ? `aria-label="${title}"` : ''} ${act === 'toggle' ? 'data-b="playbtn"' : ''}>${IC[act === 'toggle' ? 'play' : act] || ''}</button>`;

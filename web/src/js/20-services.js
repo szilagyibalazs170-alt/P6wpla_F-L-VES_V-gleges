@@ -94,6 +94,9 @@ const spotify = (() => {
       try { j = await api(`/playlists/${id}/items?limit=100`); } catch { j = await api(`/playlists/${id}/tracks?limit=100`); }
       return (j.items || []).map(i => track(i.item || i.track)).filter(Boolean);
     },
+    /** Spotify Connect eszközök (telefon, Chromecast, hangszórók, PC) és lejátszás átküldése. */
+    async devices() { const j = await api('/me/player/devices'); return (j?.devices || []).map(d => ({ id: d.id, name: d.name, type: d.type, active: d.is_active, vol: d.volume_percent })); },
+    async transfer(id) { await api('/me/player', { method: 'PUT', body: { device_ids: [id], play: true } }); },
     async liked() { const j = await api('/me/tracks?limit=50'); return j.items.map(i => track(i.track)).filter(Boolean); },
     async search(q) {
       const j = await api('/search?' + new URLSearchParams({ q, type: 'track,playlist', limit: 12 }));

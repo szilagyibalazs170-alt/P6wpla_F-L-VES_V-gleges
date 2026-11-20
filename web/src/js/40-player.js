@@ -125,6 +125,8 @@ const lp = (() => {
   setInterval(() => { if (S.mode === 'demo' && be === 'sim' && S.playing && curPos() >= S.dur - 50) load(i + 1); }, 500);
   return {
     get active() { return S.mode === 'list' || S.mode === 'demo'; },
+    get item() { return list[i]; },
+    get backend() { return be; },
     start(l, k, backend) {
       if (NATIVE && S.playing && S.mode === 'native') N('pauseExternal');
       if (be === 'yt' && backend !== 'yt') ytp.stop();

@@ -24,8 +24,11 @@
   <div id="klyr"></div>
   <canvas id="glow"></canvas>
 
-  <div id="srcBadge"><span class="srcdot"></span><span class="name">Demó</span></div>
+  <div id="srcBadge"><span class="srcdot"></span><span class="name">Demó</span><span class="out"></span></div>
+  <div id="devBanner" class="panel"></div>
   <div id="tools">
+    <button class="ib" data-act="mic" aria-label="Hangvezérlés"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></svg></button>
+    <button class="ib" data-act="cast" aria-label="Eszközök és Chromecast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/><path d="M2 20h.01"/></svg></button>
     <button class="ib" data-act="library" aria-label="Keresés és könyvtár"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
     <button class="ib" data-act="lyrics" aria-label="Dalszöveg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 10h6M9 14h4"/></svg></button>
     <button class="ib" data-act="next-theme" aria-label="Következő téma"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
@@ -51,6 +54,11 @@
     <nav id="libTabs"><button data-tab="search" class="on">Keresés</button><button data-tab="lists">Lejátszólisták</button><button data-tab="recent">Előzmények</button></nav>
     <div id="libBody"></div>
   </section>
+  <section id="dev" class="overlay">
+    <header class="lh"><h2>Eszközök</h2><button class="ib" id="devClose" aria-label="Bezárás"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+    <div id="devBody"></div>
+  </section>
+  <div id="voice" class="panel" role="status" aria-live="polite"><div class="orb"><i></i><i></i><i></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></svg></div><div class="vt"><div id="voiceText">Listening…</div><div id="voiceHint"></div></div></div>
   <aside id="sheet" class="overlay"></aside>
   <input type="file" id="filePick" accept="video/*,image/*" hidden>
   <input type="file" id="audioPick" accept="audio/*" multiple hidden>

@@ -19,9 +19,9 @@ const queueHTML = `<div class="queue panel abs"><div class="qh"><div><h4>Folytat
 const pillHTML = (extra = '') => `<div class="pill panel ${extra}">
   ${ib('shuffle', 'sm', 'Keverés')}${ib('prev', '', 'Előző')}${ib('toggle', 'pp', 'Lejátszás')}${ib('next', '', 'Következő')}${ib('repeat', 'sm', 'Ismétlés')}
   <div class="mini" data-act="open"><div class="cover"><img data-b="art" alt=""></div><div class="meta"><div class="t" data-b="title"></div><div class="a" data-b="sub"></div>${progHTML(false)}</div></div>
-  ${ib('more', 'sm', 'Továbbiak')}${ib('lyrics', 'sm', 'Dalszöveg')}${ib('list', 'sm', 'Könyvtár')}${ib('vol', 'sm', 'Hangerő')}</div>`;
+  ${ib('more', 'sm', 'Továbbiak')}${ib('lyrics', 'sm', 'Dalszöveg')}${ib('cast', 'sm', 'Eszközök')}${ib('list', 'sm', 'Könyvtár')}${ib('vol', 'sm', 'Hangerő')}</div>`;
 const searchHTML = `<button class="search panel" data-act="library">${IC.search}<span>Keresés: dalok, albumok, előadók…</span></button>`;
-const minisHTML = `<div class="minis">${ib('library', '', 'Keresés').replace(IC.library, IC.search)}${ib('target', '', 'Téma')}${ib('collapse', '', 'Letisztult')}</div>`;
+const minisHTML = `<div class="minis">${ib('mic', '', 'Hangvezérlés')}${ib('library', '', 'Keresés').replace(IC.library, IC.search)}${ib('target', '', 'Téma')}${ib('collapse', '', 'Letisztult')}</div>`;
 const ctrlHTML = `<div class="ctrl">${ib('lyrics', 'sm')}${ib('prev')}${ib('toggle', 'pp accent')}${ib('next')}${ib('list', 'sm')}</div>`;
 
 const TPL = {
@@ -382,19 +382,21 @@ app.addEventListener('click', e => {
   else if (a === 'settings') openSheet(true);
   else if (a === 'library' || a === 'list') lib.open({ view: a === 'list' ? 'home' : 'search' });
   else if (a === 'collapse') { set.minimal = !set.minimal; save(); paint(); }
+  else if (a === 'cast') devices.show();
+  else if (a === 'mic') voice.start();
   else if (a === 'vol') volPop(b);
   else if (a === 'more') morePop(b);
   else if (a === 'open') { if (NATIVE && S.mode === 'native') N('openSource'); }
   else if (a === 'fullscreen') { const d = document; (d.fullscreenElement ? d.exitFullscreen() : d.documentElement.requestFullscreen?.())?.catch?.(() => {}); }
   else if (a === 'grant') N('openNotificationAccess');
 });
-$('#scrim').addEventListener('click', () => { openSheet(false); lib.close(); });
+$('#scrim').addEventListener('click', () => { openSheet(false); lib.close(); devices.hide(); });
 addEventListener('keydown', e => {
   if (e.target.closest('input,textarea')) return;
   if (e.key === ' ') control('toggle'); else if (e.key === 'ArrowRight') cycleTheme(1); else if (e.key === 'ArrowLeft') cycleTheme(-1);
   else if (e.key === 'Escape') uiBack();
 });
-uiBack = () => { if ($('.pop')) { closePops(); return true; } if (lib.isOpen) { lib.back(); return true; } if ($('#sheet').classList.contains('on')) { openSheet(false); return true; } return false; };
+uiBack = () => { if ($('.pop')) { closePops(); return true; } if ($('#voice.on')) { voice.stop(); return true; } if (devices.isOpen) { devices.hide(); return true; } if (lib.isOpen) { lib.back(); return true; } if ($('#sheet').classList.contains('on')) { openSheet(false); return true; } return false; };
 
 /* ---------- könyvtár: keresés, lejátszólisták, albumok, előadók ---------- */
 const lib = (() => {
@@ -613,6 +615,9 @@ function renderSheet() {
   ${tog('lyrShade', 'Sötétítés a szöveg mögött', 'Világos videóklipnél jobban olvasható')}
   <h3>Kijelző</h3>${tog('clock', 'Óra')}${tog('h24', '24 órás formátum')}${rng('dim', 'Háttér sötétítése', 0, 0.85, 0.05, '%')}${tog('blur', 'Üveg elmosás')}${tog('eco', 'Energiatakarékos mód', 'Kikapcsolva a kijelző teljes frissítésén fut (120 Hz)')}
   ${NATIVE ? tog('keepAwake', 'Képernyő mindig bekapcsolva') : ''}
+  <h3 id="sec-voice">Hangvezérlés (angol)</h3>
+  <div class="hint">Koppints a 🎙 gombra, és mondd angolul, pl.: <b>“next song”</b>, <b>“previous”</b>, <b>“pause”</b>, <b>“play Drip Too Hard by Lil Baby”</b>, <b>“search Drake”</b>, <b>“volume up”</b>, <b>“volume 40”</b>, <b>“shuffle”</b>, <b>“show lyrics”</b>, <b>“neon lyrics”</b>, <b>“next theme”</b>, <b>“what’s playing”</b>, <b>“open devices”</b>, <b>“cast to Living Room TV”</b>.</div>
+  ${tog('voiceReply', 'Hangos visszajelzés (angol)', 'A Halo röviden válaszol, pl. „Playing … by …”')}
   <h3 id="sec-play">Lejátszás</h3>${seg('playVia', 'A keresett dalok itt szólnak', [['spotify', 'Spotify'], ['ytmusic', 'YouTube Music'], ['soundcloud', 'SoundCloud'], ['halo', 'Halo (YouTube)'], ['preview', '30 mp előzetes']])}
   <div class="hint">Spotify / YouTube Music / SoundCloud: a Halo a telefonon lévő appban indítja el a dalt, és onnan követi. Halo (YouTube): itt játssza le a videóklippel együtt (YouTube API kulcs kell).</div>
   ${seg('country', 'Katalógus ország', [['US', 'USA'], ['HU', 'Magyarország'], ['GB', 'UK'], ['DE', 'Németország']])}
@@ -631,7 +636,7 @@ function renderSheet() {
   <h3>Forrás</h3>${NATIVE ? `<div class="status ${S.access ? 'ok' : ''}"><i></i>${S.access ? 'Értesítés-hozzáférés engedélyezve' : 'Nincs értesítés-hozzáférés'}</div>
     <div class="acts"><button class="btn ${S.access ? '' : 'pri'}" data-act="grant">Hozzáférés beállítása</button></div>`
     : `<div class="hint">Böngészős demó. Kipróbálhatod saját zenefájlokkal is (a fényperem ilyenkor a basszusra lüktet):</div><div class="acts"><button class="btn pri" data-audio>Saját zene betöltése</button></div>`}
-  <h3>Névjegy</h3><div class="hint">Halo Player 1.3 · Katalógus: iTunes Search · Dalszöveg: LRCLIB · Klipek: YouTube</div>`;
+  <h3>Névjegy</h3><div class="hint">Halo Player 1.4 · Katalógus: iTunes Search · Dalszöveg: LRCLIB · Klipek: YouTube</div>`;
   slInit(sheet);
 }
 sheet.addEventListener('click', async e => {
@@ -662,6 +667,7 @@ function applySettings(k) {
   clock(); paint();
   if (k === 'beat') N('setBeat', !!set.beat);
   if (NATIVE && (!k || k === 'keepAwake')) N('setKeepAwake', !!set.keepAwake);
+  if (k === 'voiceReply' && set.voiceReply) speak('Voice replies on');
   if (k === 'vidOffset' || k === 'dim') applyBg();
   if (k && k.startsWith('lyr')) lyrics.refresh();
   if (!k || k === 'eco') N('setHighRefresh', !set.eco);
@@ -678,6 +684,7 @@ function loop(now) {
   requestAnimationFrame(loop);
   if (set.eco && now - lastF < 30) return; lastF = now;
   const t = now / 1000; let energy;
+  const fl = S.flashAt ? Math.max(0, 1 - (now - S.flashAt) / 1600) : 0;
   if (!S.playing) energy = 0.5 + 0.06 * Math.sin(t * 1.3);
   else {
     let lv = lp.level();
@@ -685,7 +692,7 @@ function loop(now) {
     if (lv >= 0 && set.pulse) energy = 0.62 + lv * 0.95;
     else { const ph = (t * 94 / 60) % 1; energy = 0.88 + (set.pulse ? 0.22 * Math.exp(-ph * 5) : 0); }
   }
-  glow.frame(t, energy);
+  glow.frame(t, energy + fl * 0.9);
   tick();
 }
 

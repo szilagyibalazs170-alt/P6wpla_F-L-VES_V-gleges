@@ -549,6 +549,79 @@ input{font:inherit;color:inherit}
 .pv-poster{font-family:var(--clockfont);font-weight:800;text-transform:uppercase;font-size:1.5rem!important;letter-spacing:-.01em}
 .pv-subtitle{display:inline-block;font-weight:700;font-size:.95rem!important;background:rgba(0,0,0,.5);padding:.15rem .5rem;border-radius:.35rem}.pv-subtitle i{font-style:normal;color:var(--gold)}
 .pv-list{font-weight:800;font-size:.85rem!important;line-height:1.25!important;color:rgba(255,255,255,.4)}.pv-list b{color:#fff;font-size:inherit;display:inline}
+
+/* ---------- eszközök panel ---------- */
+#dev{position:absolute;z-index:84;top:0;right:0;bottom:0;width:min(30rem,94vw);display:flex;flex-direction:column;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 10%,rgba(18,16,24,.9)),rgba(12,10,16,.92));border-left:1px solid var(--line);
+  backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(30px) saturate(1.4);transform:translateX(105%);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+#dev.on{transform:none}
+#dev .lh{justify-content:space-between;padding:1.2rem 1.3rem .4rem}
+#dev h2{font-family:var(--lyrfont);font-variation-settings:'SOFT' 100;font-size:1.7rem;font-weight:900}
+#devBody{flex:1;overflow-y:auto;padding:.4rem 1.3rem 2rem}
+#devBody h3{display:flex;align-items:center;gap:.5rem;font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:1.4rem 0 .5rem}
+#devBody h3 svg{width:.95rem;height:.95rem}
+#devBody h3 .lnk{margin-left:auto;font-size:.66rem;letter-spacing:0;text-transform:none}
+#devBody h4{font-size:.66rem;font-weight:700;color:var(--faint);margin:.9rem 0 .3rem;display:flex;align-items:center;gap:.4rem}
+#devBody .hint{font-size:.7rem;color:var(--muted);line-height:1.5;padding:.3rem 0}
+.now{display:flex;gap:1rem;align-items:center;padding:1rem 1.1rem;margin-top:.4rem}
+.now .k{font-size:.55rem;font-weight:800;letter-spacing:.16em;color:var(--accent)}
+.now .t{font-size:1.15rem;font-weight:800;margin:.1rem 0}
+.now .a{font-size:.64rem;color:var(--muted)}
+.ring{position:relative;width:3rem;height:3rem;border-radius:50%;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--accent) 22%,rgba(255,255,255,.06));color:var(--accent)}
+.ring::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--accent);opacity:.5;animation:ringp 2.2s ease-out infinite}
+.ring svg{width:1.4rem;height:1.4rem}
+@keyframes ringp{0%{transform:scale(.9);opacity:.6}100%{transform:scale(1.35);opacity:0}}
+.dacts{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.8rem}
+.dacts .btn{font-size:.68rem;padding:.5rem .75rem}
+.drow{display:flex;align-items:center;gap:.75rem;padding:.6rem .55rem;border-radius:.8rem;cursor:pointer;transition:background .2s}
+.drow:active,.drow:hover{background:var(--hi)}
+.drow.on{background:color-mix(in srgb,var(--accent) 16%,transparent)}
+.drow .di{width:2.3rem;height:2.3rem;border-radius:.7rem;display:grid;place-items:center;background:rgba(255,255,255,.07);flex:none}
+.drow .di svg{width:1.1rem;height:1.1rem}
+.drow .meta{flex:1;min-width:0}
+.drow .t{font-size:.8rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drow .a{font-size:.62rem;color:var(--muted)}
+.drow .ok{color:#3ddc84;font-weight:700}
+.drow .dot{width:.55rem;height:.55rem;border-radius:50%;background:#3ddc84;box-shadow:0 0 .6rem #3ddc84}
+.drow .go{font-size:.62rem;font-weight:800;color:var(--accent);padding:.3rem .6rem;border-radius:99px;border:1px solid color-mix(in srgb,var(--accent) 50%,transparent)}
+.mini-spin{display:inline-block;width:.8rem;height:.8rem;border-radius:50%;border:2px solid var(--hi);border-top-color:var(--accent);animation:spin .8s linear infinite;vertical-align:-2px}
+#srcBadge .out{display:none;align-items:center;gap:.3rem;color:var(--muted);font-weight:600}
+#srcBadge .out.on{display:inline-flex}
+#srcBadge .out svg{width:.8rem;height:.8rem}
+#srcBadge .out i{font-style:normal;opacity:.6}
+
+/* csatlakozás-jelzés */
+#devBanner{position:absolute;z-index:96;left:50%;top:1rem;display:flex;align-items:center;gap:.9rem;padding:.7rem 1.4rem .7rem .7rem;border-radius:99px;
+  transform:translate(-50%,-160%) scale(.9);opacity:0;transition:transform .6s cubic-bezier(.2,1.3,.3,1),opacity .4s;pointer-events:none;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 30%,rgba(20,18,26,.85)),rgba(16,14,20,.85));box-shadow:0 1rem 3rem rgba(0,0,0,.5),0 0 2.4rem color-mix(in srgb,var(--accent) 35%,transparent)}
+#devBanner.on{transform:translate(-50%,0) scale(1);opacity:1}
+#devBanner .k{font-size:.58rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+#devBanner .t{font-size:1rem;font-weight:800}
+#devBanner.connected .ring,#devBanner.paired .ring{background:rgba(61,220,132,.2);color:#3ddc84}
+#devBanner.connected .ring::after,#devBanner.paired .ring::after{border-color:#3ddc84}
+#devBanner.disconnected .ring,#devBanner.failed .ring{background:rgba(255,255,255,.08);color:var(--muted)}
+#devBanner.disconnected .ring::after,#devBanner.failed .ring::after{display:none}
+
+/* hangvezérlés */
+#voice{position:absolute;z-index:97;left:50%;bottom:19vh;display:flex;align-items:center;gap:1.1rem;padding:1rem 1.6rem 1rem 1rem;border-radius:2rem;min-width:min(34rem,90vw);max-width:92vw;
+  transform:translate(-50%,140%);opacity:0;transition:transform .55s cubic-bezier(.2,1.2,.3,1),opacity .35s;pointer-events:none;--lv:0;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 22%,rgba(18,16,24,.9)),rgba(14,12,18,.9))}
+#voice.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+#voice .orb{position:relative;width:3.4rem;height:3.4rem;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--accent);color:#111;
+  box-shadow:0 0 calc(1rem + var(--lv) * 2.6rem) color-mix(in srgb,var(--accent) 70%,transparent);transform:scale(calc(1 + var(--lv) * .18));transition:transform .08s linear,box-shadow .08s linear}
+#voice .orb svg{width:1.4rem;height:1.4rem;position:relative}
+#voice .orb i{position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent);opacity:0;animation:vring 1.8s ease-out infinite}
+#voice .orb i:nth-child(2){animation-delay:.6s}#voice .orb i:nth-child(3){animation-delay:1.2s}
+@keyframes vring{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.1);opacity:0}}
+#voice.think .orb{animation:vth 1s ease-in-out infinite}
+@keyframes vth{50%{transform:scale(.9)}}
+#voice.done .orb i,#voice.err .orb i{animation:none}
+#voice.err .orb{background:#666}
+#voice .vt{min-width:0}
+#voiceText{font-size:1.15rem;font-weight:800;line-height:1.25;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#voiceHint{font-size:.66rem;color:var(--muted);margin-top:.25rem}
+#voice.done #voiceHint{display:none}
+@media (orientation:portrait){#dev{width:100vw}#voice{bottom:16vh}}
 </style>
 </head>
 <body>
@@ -567,8 +640,11 @@ input{font:inherit;color:inherit}
   <div id="klyr"></div>
   <canvas id="glow"></canvas>
 
-  <div id="srcBadge"><span class="srcdot"></span><span class="name">Demó</span></div>
+  <div id="srcBadge"><span class="srcdot"></span><span class="name">Demó</span><span class="out"></span></div>
+  <div id="devBanner" class="panel"></div>
   <div id="tools">
+    <button class="ib" data-act="mic" aria-label="Hangvezérlés"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></svg></button>
+    <button class="ib" data-act="cast" aria-label="Eszközök és Chromecast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/><path d="M2 20h.01"/></svg></button>
     <button class="ib" data-act="library" aria-label="Keresés és könyvtár"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
     <button class="ib" data-act="lyrics" aria-label="Dalszöveg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 10h6M9 14h4"/></svg></button>
     <button class="ib" data-act="next-theme" aria-label="Következő téma"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
@@ -594,6 +670,11 @@ input{font:inherit;color:inherit}
     <nav id="libTabs"><button data-tab="search" class="on">Keresés</button><button data-tab="lists">Lejátszólisták</button><button data-tab="recent">Előzmények</button></nav>
     <div id="libBody"></div>
   </section>
+  <section id="dev" class="overlay">
+    <header class="lh"><h2>Eszközök</h2><button class="ib" id="devClose" aria-label="Bezárás"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+    <div id="devBody"></div>
+  </section>
+  <div id="voice" class="panel" role="status" aria-live="polite"><div class="orb"><i></i><i></i><i></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></svg></div><div class="vt"><div id="voiceText">Listening…</div><div id="voiceHint"></div></div></div>
   <aside id="sheet" class="overlay"></aside>
   <input type="file" id="filePick" accept="video/*,image/*" hidden>
   <input type="file" id="audioPick" accept="audio/*" multiple hidden>
@@ -623,7 +704,7 @@ const N = (m, ...a) => { try { return NATIVE ? HaloNative[m](...a) : undefined; 
 
 const DEF = {
   theme: 'albums', glowMode: 'auto', preset: 0, glowInt: 0.9, thick: 1, sparks: true, pulse: true, beat: false,
-  clock: true, h24: true, dim: 0.28, blur: true, lyr: false, lyrStyle: 'kinetic', lyrFont: 'auto', lyrSize: 1, lyrHl: 'gold', lyrPos: 'auto', lyrShade: false, eco: false, bgByTheme: {}, keepAwake: true,
+  clock: true, h24: true, dim: 0.28, blur: true, lyr: false, lyrStyle: 'kinetic', lyrFont: 'auto', lyrSize: 1, lyrHl: 'gold', lyrPos: 'auto', lyrShade: false, voiceReply: true, eco: false, bgByTheme: {}, keepAwake: true,
   videoBg: true, ytKey: '', spClient: '', playVia: 'spotify', country: 'US', minimal: false, vidOffset: 0,
 };
 const set = Object.assign({}, DEF, store.get('set', {}));
@@ -729,6 +810,8 @@ const IC = {
   heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7-4.4-9.2-8.6C1.2 8.3 3.1 4.5 6.7 4.5c2.1 0 3.4 1.2 4.1 2.4h.4c.7-1.2 2-2.4 4.1-2.4 3.6 0 5.5 3.8 3.9 6.9C19 15.6 12 20 12 20z"/></svg>',
   theme: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
   gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>',
+  cast: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/><path d="M2 20h.01"/></svg>',
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></svg>',
   library: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4v16M9 4v16M14 4l6 16"/></svg>',
 };
 const ib = (act, cls = '', title = '') => `<button class="ib ${cls}" data-act="${act}" ${title ? `aria-label="${title}"` : ''} ${act === 'toggle' ? 'data-b="playbtn"' : ''}>${IC[act === 'toggle' ? 'play' : act] || ''}</button>`;
@@ -830,6 +913,9 @@ const spotify = (() => {
       try { j = await api(`/playlists/${id}/items?limit=100`); } catch { j = await api(`/playlists/${id}/tracks?limit=100`); }
       return (j.items || []).map(i => track(i.item || i.track)).filter(Boolean);
     },
+    /** Spotify Connect eszközök (telefon, Chromecast, hangszórók, PC) és lejátszás átküldése. */
+    async devices() { const j = await api('/me/player/devices'); return (j?.devices || []).map(d => ({ id: d.id, name: d.name, type: d.type, active: d.is_active, vol: d.volume_percent })); },
+    async transfer(id) { await api('/me/player', { method: 'PUT', body: { device_ids: [id], play: true } }); },
     async liked() { const j = await api('/me/tracks?limit=50'); return j.items.map(i => track(i.track)).filter(Boolean); },
     async search(q) {
       const j = await api('/search?' + new URLSearchParams({ q, type: 'track,playlist', limit: 12 }));
@@ -1224,6 +1310,8 @@ const lp = (() => {
   setInterval(() => { if (S.mode === 'demo' && be === 'sim' && S.playing && curPos() >= S.dur - 50) load(i + 1); }, 500);
   return {
     get active() { return S.mode === 'list' || S.mode === 'demo'; },
+    get item() { return list[i]; },
+    get backend() { return be; },
     start(l, k, backend) {
       if (NATIVE && S.playing && S.mode === 'native') N('pauseExternal');
       if (be === 'yt' && backend !== 'yt') ytp.stop();
@@ -1350,9 +1438,9 @@ const queueHTML = `<div class="queue panel abs"><div class="qh"><div><h4>Folytat
 const pillHTML = (extra = '') => `<div class="pill panel ${extra}">
   ${ib('shuffle', 'sm', 'Keverés')}${ib('prev', '', 'Előző')}${ib('toggle', 'pp', 'Lejátszás')}${ib('next', '', 'Következő')}${ib('repeat', 'sm', 'Ismétlés')}
   <div class="mini" data-act="open"><div class="cover"><img data-b="art" alt=""></div><div class="meta"><div class="t" data-b="title"></div><div class="a" data-b="sub"></div>${progHTML(false)}</div></div>
-  ${ib('more', 'sm', 'Továbbiak')}${ib('lyrics', 'sm', 'Dalszöveg')}${ib('list', 'sm', 'Könyvtár')}${ib('vol', 'sm', 'Hangerő')}</div>`;
+  ${ib('more', 'sm', 'Továbbiak')}${ib('lyrics', 'sm', 'Dalszöveg')}${ib('cast', 'sm', 'Eszközök')}${ib('list', 'sm', 'Könyvtár')}${ib('vol', 'sm', 'Hangerő')}</div>`;
 const searchHTML = `<button class="search panel" data-act="library">${IC.search}<span>Keresés: dalok, albumok, előadók…</span></button>`;
-const minisHTML = `<div class="minis">${ib('library', '', 'Keresés').replace(IC.library, IC.search)}${ib('target', '', 'Téma')}${ib('collapse', '', 'Letisztult')}</div>`;
+const minisHTML = `<div class="minis">${ib('mic', '', 'Hangvezérlés')}${ib('library', '', 'Keresés').replace(IC.library, IC.search)}${ib('target', '', 'Téma')}${ib('collapse', '', 'Letisztult')}</div>`;
 const ctrlHTML = `<div class="ctrl">${ib('lyrics', 'sm')}${ib('prev')}${ib('toggle', 'pp accent')}${ib('next')}${ib('list', 'sm')}</div>`;
 
 const TPL = {
@@ -1713,19 +1801,21 @@ app.addEventListener('click', e => {
   else if (a === 'settings') openSheet(true);
   else if (a === 'library' || a === 'list') lib.open({ view: a === 'list' ? 'home' : 'search' });
   else if (a === 'collapse') { set.minimal = !set.minimal; save(); paint(); }
+  else if (a === 'cast') devices.show();
+  else if (a === 'mic') voice.start();
   else if (a === 'vol') volPop(b);
   else if (a === 'more') morePop(b);
   else if (a === 'open') { if (NATIVE && S.mode === 'native') N('openSource'); }
   else if (a === 'fullscreen') { const d = document; (d.fullscreenElement ? d.exitFullscreen() : d.documentElement.requestFullscreen?.())?.catch?.(() => {}); }
   else if (a === 'grant') N('openNotificationAccess');
 });
-$('#scrim').addEventListener('click', () => { openSheet(false); lib.close(); });
+$('#scrim').addEventListener('click', () => { openSheet(false); lib.close(); devices.hide(); });
 addEventListener('keydown', e => {
   if (e.target.closest('input,textarea')) return;
   if (e.key === ' ') control('toggle'); else if (e.key === 'ArrowRight') cycleTheme(1); else if (e.key === 'ArrowLeft') cycleTheme(-1);
   else if (e.key === 'Escape') uiBack();
 });
-uiBack = () => { if ($('.pop')) { closePops(); return true; } if (lib.isOpen) { lib.back(); return true; } if ($('#sheet').classList.contains('on')) { openSheet(false); return true; } return false; };
+uiBack = () => { if ($('.pop')) { closePops(); return true; } if ($('#voice.on')) { voice.stop(); return true; } if (devices.isOpen) { devices.hide(); return true; } if (lib.isOpen) { lib.back(); return true; } if ($('#sheet').classList.contains('on')) { openSheet(false); return true; } return false; };
 
 /* ---------- könyvtár: keresés, lejátszólisták, albumok, előadók ---------- */
 const lib = (() => {
@@ -1944,6 +2034,9 @@ function renderSheet() {
   ${tog('lyrShade', 'Sötétítés a szöveg mögött', 'Világos videóklipnél jobban olvasható')}
   <h3>Kijelző</h3>${tog('clock', 'Óra')}${tog('h24', '24 órás formátum')}${rng('dim', 'Háttér sötétítése', 0, 0.85, 0.05, '%')}${tog('blur', 'Üveg elmosás')}${tog('eco', 'Energiatakarékos mód', 'Kikapcsolva a kijelző teljes frissítésén fut (120 Hz)')}
   ${NATIVE ? tog('keepAwake', 'Képernyő mindig bekapcsolva') : ''}
+  <h3 id="sec-voice">Hangvezérlés (angol)</h3>
+  <div class="hint">Koppints a 🎙 gombra, és mondd angolul, pl.: <b>“next song”</b>, <b>“previous”</b>, <b>“pause”</b>, <b>“play Drip Too Hard by Lil Baby”</b>, <b>“search Drake”</b>, <b>“volume up”</b>, <b>“volume 40”</b>, <b>“shuffle”</b>, <b>“show lyrics”</b>, <b>“neon lyrics”</b>, <b>“next theme”</b>, <b>“what’s playing”</b>, <b>“open devices”</b>, <b>“cast to Living Room TV”</b>.</div>
+  ${tog('voiceReply', 'Hangos visszajelzés (angol)', 'A Halo röviden válaszol, pl. „Playing … by …”')}
   <h3 id="sec-play">Lejátszás</h3>${seg('playVia', 'A keresett dalok itt szólnak', [['spotify', 'Spotify'], ['ytmusic', 'YouTube Music'], ['soundcloud', 'SoundCloud'], ['halo', 'Halo (YouTube)'], ['preview', '30 mp előzetes']])}
   <div class="hint">Spotify / YouTube Music / SoundCloud: a Halo a telefonon lévő appban indítja el a dalt, és onnan követi. Halo (YouTube): itt játssza le a videóklippel együtt (YouTube API kulcs kell).</div>
   ${seg('country', 'Katalógus ország', [['US', 'USA'], ['HU', 'Magyarország'], ['GB', 'UK'], ['DE', 'Németország']])}
@@ -1962,7 +2055,7 @@ function renderSheet() {
   <h3>Forrás</h3>${NATIVE ? `<div class="status ${S.access ? 'ok' : ''}"><i></i>${S.access ? 'Értesítés-hozzáférés engedélyezve' : 'Nincs értesítés-hozzáférés'}</div>
     <div class="acts"><button class="btn ${S.access ? '' : 'pri'}" data-act="grant">Hozzáférés beállítása</button></div>`
     : `<div class="hint">Böngészős demó. Kipróbálhatod saját zenefájlokkal is (a fényperem ilyenkor a basszusra lüktet):</div><div class="acts"><button class="btn pri" data-audio>Saját zene betöltése</button></div>`}
-  <h3>Névjegy</h3><div class="hint">Halo Player 1.3 · Katalógus: iTunes Search · Dalszöveg: LRCLIB · Klipek: YouTube</div>`;
+  <h3>Névjegy</h3><div class="hint">Halo Player 1.4 · Katalógus: iTunes Search · Dalszöveg: LRCLIB · Klipek: YouTube</div>`;
   slInit(sheet);
 }
 sheet.addEventListener('click', async e => {
@@ -1993,6 +2086,7 @@ function applySettings(k) {
   clock(); paint();
   if (k === 'beat') N('setBeat', !!set.beat);
   if (NATIVE && (!k || k === 'keepAwake')) N('setKeepAwake', !!set.keepAwake);
+  if (k === 'voiceReply' && set.voiceReply) speak('Voice replies on');
   if (k === 'vidOffset' || k === 'dim') applyBg();
   if (k && k.startsWith('lyr')) lyrics.refresh();
   if (!k || k === 'eco') N('setHighRefresh', !set.eco);
@@ -2009,6 +2103,7 @@ function loop(now) {
   requestAnimationFrame(loop);
   if (set.eco && now - lastF < 30) return; lastF = now;
   const t = now / 1000; let energy;
+  const fl = S.flashAt ? Math.max(0, 1 - (now - S.flashAt) / 1600) : 0;
   if (!S.playing) energy = 0.5 + 0.06 * Math.sin(t * 1.3);
   else {
     let lv = lp.level();
@@ -2016,7 +2111,7 @@ function loop(now) {
     if (lv >= 0 && set.pulse) energy = 0.62 + lv * 0.95;
     else { const ph = (t * 94 / 60) % 1; energy = 0.88 + (set.pulse ? 0.22 * Math.exp(-ph * 5) : 0); }
   }
-  glow.frame(t, energy);
+  glow.frame(t, energy + fl * 0.9);
   tick();
 }
 
@@ -2042,6 +2137,261 @@ else {
   lp.start(demo, 0, 'sim');
 }
 requestAnimationFrame(loop);
+
+/* ---- 60-devices.js ---- */
+/* ===== eszközök: Chromecast / Google Cast, Spotify Connect, Bluetooth hangszórók, csatlakozás-jelzés ===== */
+const DIC = {
+  bluetooth: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10-5 5V2l5 5L7 17"/></svg>',
+  cast: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/><path d="M2 20h.01"/></svg>',
+  tv: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="13" rx="2"/><path d="M8 21h8"/></svg>',
+  speaker: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><circle cx="12" cy="14" r="3.5"/><path d="M12 6.5h.01"/></svg>',
+  headphones: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>',
+  car: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5l-2-5H7l-2 5zM5 17v2M19 17v2M7.5 13.5h.01M16.5 13.5h.01"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>',
+  computer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+  wired: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>',
+  mirror: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4M9 10.5l3-3 3 3M12 7.5V14"/></svg>',
+  output: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>',
+  refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg>',
+};
+IC.cast = DIC.cast;
+const KIND_LABEL = { bluetooth: 'Bluetooth', cast: 'Chromecast', wired: 'Vezetékes', usb: 'USB', hdmi: 'HDMI', speaker: 'Beépített' };
+
+const devices = (() => {
+  const el = $('#dev'), body = $('#devBody');
+  let st = { output: { kind: 'speaker', name: NATIVE ? 'Telefon hangszóró' : 'Ez az eszköz' }, paired: [], nearby: [], casts: [], btOn: true, scanning: false, castOk: true, casting: false };
+  let spDevs = null, spErr = '', pendingCast = null;
+  const open = () => el.classList.contains('on');
+
+  function devIcon(type) { return DIC[type] || DIC.speaker; }
+  function spType(t) { return /tv|cast/i.test(t) ? 'tv' : /speaker|avr|stb/i.test(t) ? 'speaker' : /smartphone/i.test(t) ? 'phone' : /tablet/i.test(t) ? 'phone' : /computer/i.test(t) ? 'computer' : 'speaker'; }
+  function row(icon, name, sub, right, attrs = '', on = false) {
+    return `<div class="drow ${on ? 'on' : ''}" ${attrs}><span class="di">${icon}</span><div class="meta"><div class="t">${esc(name)}</div><div class="a">${sub}</div></div>${right || ''}</div>`;
+  }
+  function render() {
+    if (!open()) return;
+    const o = st.output;
+    let h = `<div class="now panel"><span class="ring">${devIcon(o.kind === 'cast' ? 'tv' : o.kind === 'speaker' ? 'phone' : o.kind)}</span><div><div class="k">MOST ITT SZÓL</div><div class="t">${esc(o.name)}</div><div class="a">${esc(KIND_LABEL[o.kind] || '')}${S.title ? ' · ' + esc(S.title) : ''}</div></div></div>`;
+    if (NATIVE) h += `<div class="dacts"><button class="btn" data-d="output">${DIC.output} Kimenet váltása</button><button class="btn" data-d="mirror">${DIC.mirror} Képernyő kivetítése</button><button class="btn" data-d="btset">${DIC.bluetooth} Bluetooth</button></div>`;
+    // Chromecast
+    if (NATIVE) {
+      h += `<h3>${DIC.cast} Chromecast és Google Cast ${st.casting ? '<button class="lnk" data-d="caststop">Leválasztás</button>' : ''}</h3>`;
+      h += st.casts.length ? st.casts.map(r => row(devIcon(r.type), r.name, r.selected ? '<b class="ok">Csatlakozva</b>' : esc(r.desc || 'Google Cast'), r.selected ? '<span class="dot"></span>' : '', `data-cast="${esc(r.id)}"`, r.selected)).join('')
+        : `<div class="hint">${st.castOk ? '<span class="mini-spin"></span> Keresés a Wi-Fi hálózaton…' : 'A Google Cast nem érhető el ezen a készüléken.'}</div>`;
+    }
+    // Spotify Connect
+    h += `<h3><i class="srcdot" style="--src:#1ed760"></i> Spotify Connect</h3>`;
+    if (!spotify.connected) h += `<div class="hint">Kösd össze a Spotify-t (⚙ → Fiókok), és a zenét egy koppintással átküldheted bármelyik Spotify-eszközre — Chromecastra, okoshangszóróra, gépre.</div>`;
+    else if (spDevs == null) h += `<div class="hint"><span class="mini-spin"></span> Eszközök lekérése…</div>`;
+    else if (spErr) h += `<div class="hint">${esc(spErr)}</div>`;
+    else h += spDevs.length ? spDevs.map(d => row(devIcon(spType(d.type)), d.name, d.active ? '<b class="ok">Itt szól</b>' : esc(d.type), d.active ? '<span class="dot"></span>' : '', `data-sp="${esc(d.id)}"`, d.active)).join('') : '<div class="hint">Nincs elérhető Spotify-eszköz. Nyisd meg a Spotify appot a telefonon.</div>';
+    // Bluetooth
+    if (NATIVE) {
+      h += `<h3>${DIC.bluetooth} Bluetooth hangszórók <button class="lnk" data-d="rescan">${st.scanning ? 'Keresés…' : 'Újrakeresés'}</button></h3>`;
+      if (!st.btOn) h += `<div class="hint">A Bluetooth ki van kapcsolva. <button class="lnk" data-d="btset">Bekapcsolás</button></div>`;
+      else if (st.needPerm) h += `<div class="hint">A közeli eszközök kereséséhez engedély kell. <button class="lnk" data-d="rescan">Engedélyezés</button></div>`;
+      else {
+        h += st.paired.length ? st.paired.map(d => row(devIcon(d.type), d.name, d.connected ? '<b class="ok">Csatlakozva</b>' : 'Párosítva', d.connected ? '<span class="dot"></span>' : '<span class="go">Csatlakozás</span>', `data-bt="${esc(d.address)}" data-conn="${d.connected ? 1 : 0}"`, d.connected)).join('') : '<div class="hint">Nincs párosított hangszóró.</div>';
+        h += `<h4>A közelben ${st.scanning ? '<span class="mini-spin"></span>' : ''}</h4>`;
+        h += st.nearby.length ? st.nearby.map(d => row(devIcon(d.type), d.name, 'Új eszköz', '<span class="go">Párosítás</span>', `data-pair="${esc(d.address)}"`)).join('')
+          : `<div class="hint">${st.scanning ? 'Keresés… Kapcsold a hangszórót párosítási módba.' : 'Nem található új eszköz. Kapcsold a hangszórót párosítási módba, majd keress újra.'}</div>`;
+      }
+    } else h += `<div class="hint" style="margin-top:1rem">A Chromecast és a Bluetooth-eszközök az Android appban érhetők el.</div>`;
+    body.innerHTML = h;
+  }
+  async function loadSp() {
+    if (!spotify.connected) return;
+    spDevs = null; spErr = ''; render();
+    try { spDevs = await spotify.devices(); } catch (e) { spDevs = []; spErr = 'A Spotify-eszközök nem érhetők el (' + e.message + ').'; }
+    render();
+  }
+  function show() {
+    el.classList.add('on'); $('#scrim').classList.add('on'); app.classList.remove('idle');
+    if (NATIVE) N('devicesOpen');
+    render(); loadSp();
+  }
+  function hide() { el.classList.remove('on'); if (!lib.isOpen && !$('#sheet').classList.contains('on')) $('#scrim').classList.remove('on'); N('devicesClose'); }
+
+  async function castTo(r) {
+    // 1) ha a Spotify ugyanezt az eszközt látja: oda küldjük a zenét (Spotify Connect)
+    if (spotify.connected) {
+      try {
+        const ds = spDevs || await spotify.devices();
+        const m = ds.find(d => norm(d.name) === norm(r.name) || norm(d.name).includes(norm(r.name)) || norm(r.name).includes(norm(d.name)));
+        if (m) { await spotify.transfer(m.id); toastMsg('Átküldve: ' + r.name); return loadSp(); }
+      } catch {}
+    }
+    // 2) ha a Halo maga játszik előzetest: Cast-munkamenet és küldés
+    if (lp.active && lp.item?.preview) { pendingCast = true; N('castSelect', r.id); toastMsg('Csatlakozás: ' + r.name + '…'); return; }
+    // 3) külső app (Spotify, YouTube Music…): a rendszer kimenetváltója vagy az app saját Cast gombja
+    toastMsg(`A(z) ${r.name} eszközre a ${srcInfo()[0]} saját Cast gombjával, vagy a Kimenet váltásával küldheted a zenét`);
+    N('outputSwitcher');
+  }
+  function castCurrent() {
+    const it = lp.item; if (!it?.preview) return;
+    N('castLoad', it.preview, it.title || '', String(it.artist || ''), it.art || '');
+    $('#audio').pause();
+  }
+
+  el.addEventListener('click', async e => {
+    const t = e.target;
+    if (t.closest('#devClose')) return hide();
+    const d = t.closest('[data-d]')?.dataset.d;
+    if (d === 'output') return N('outputSwitcher');
+    if (d === 'mirror') return N('mirror');
+    if (d === 'btset') return N('btSettings');
+    if (d === 'rescan') { N('devicesOpen'); return; }
+    if (d === 'caststop') { N('castStop'); return; }
+    const c = t.closest('[data-cast]'); if (c) { const r = st.casts.find(x => x.id === c.dataset.cast); if (r && !r.selected) castTo(r); return; }
+    const sp = t.closest('[data-sp]'); if (sp) { try { await spotify.transfer(sp.dataset.sp); toastMsg('Átküldve ✓'); } catch (er) { toastMsg('Nem sikerült: ' + er.message); } return loadSp(); }
+    const b = t.closest('[data-bt]'); if (b) { if (b.dataset.conn === '1') N('outputSwitcher'); else { toastMsg('Kapcsold be a hangszórót — a rendszer kimenetváltójában is választhatod'); N('outputSwitcher'); } return; }
+    const p = t.closest('[data-pair]'); if (p) { N('btPair', p.dataset.pair); p.querySelector('.go').textContent = 'Párosítás…'; }
+  });
+
+  /* csatlakozás-jelzés (animált kártya felül) */
+  let bT;
+  function banner(ev) {
+    const bn = $('#devBanner');
+    const txt = { connected: 'Csatlakozva', disconnected: 'Leválasztva', paired: 'Párosítva', failed: 'Nem sikerült csatlakozni' }[ev.type] || ev.type;
+    const icon = ev.kind === 'cast' ? DIC.tv : ev.kind === 'bluetooth' ? DIC.bluetooth : ev.kind === 'wired' ? DIC.headphones : DIC.speaker;
+    bn.className = 'panel ' + ev.type; bn.innerHTML = `<span class="ring">${icon}</span><div><div class="k">${esc(KIND_LABEL[ev.kind] || 'Eszköz')} · ${esc(txt)}</div><div class="t">${esc(ev.name)}</div></div>`;
+    void bn.offsetWidth; bn.classList.add('on'); S.flashAt = performance.now();
+    clearTimeout(bT); bT = setTimeout(() => bn.classList.remove('on'), 3800);
+    if (set.voiceReply && ev.type === 'connected' && typeof speak === 'function') speak(`Connected to ${ev.name}`);
+  }
+
+  window.Halo.onDevices = s => { st = Object.assign(st, typeof s === 'string' ? JSON.parse(s) : s); S.casting = !!st.casting; render(); paintOutput(); };
+  window.Halo.onOutput = v => { const [kind, name] = String(v).split('|'); st.output = { kind, name }; paintOutput(); render(); };
+  window.Halo.onDeviceEvent = ev => {
+    if (typeof ev === 'string') ev = JSON.parse(ev);
+    banner(ev);
+    if (ev.kind === 'cast' && ev.type === 'connected' && pendingCast) { pendingCast = null; castCurrent(); }
+  };
+  function paintOutput() {
+    const o = st.output, b = $('#srcBadge .out');
+    const show = o && o.kind !== 'speaker';
+    b.innerHTML = show ? `<i>→</i>${devIcon(o.kind === 'cast' ? 'tv' : o.kind)}<span>${esc(o.name)}</span>` : '';
+    b.classList.toggle('on', !!show);
+  }
+  return { show, hide, get isOpen() { return open(); }, castTo, get state() { return st; }, castCurrent };
+})();
+
+/* ---- 61-voice.js ---- */
+/* ===== angol hangvezérlés: felismerés, parancsértelmezés, hangos visszajelzés ===== */
+function speak(text) {
+  if (!set.voiceReply) return;
+  if (NATIVE) return N('speak', text);
+  try { const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch {}
+}
+
+const voice = (() => {
+  const ov = $('#voice'), tx = $('#voiceText'), hint = $('#voiceHint');
+  let active = false, webRec = null, hideT;
+  const HINTS = ['“next song”', '“play Drip Too Hard by Lil Baby”', '“volume up”', '“pause”', '“show lyrics”', '“neon lyrics”', '“what’s playing”', '“search Drake”', '“next theme”', '“cast to Living Room TV”'];
+  const THEME_EN = { albums: 'albums', album: 'albums', arc: 'arc', pearl: 'pearl', dial: 'dial', vinyl: 'dial', spotlight: 'spotlight', vision: 'vision', glass: 'vision', tile: 'tile', clock: 'tile', lyrics: 'karaoke', karaoke: 'karaoke' };
+  const STYLE_EN = { kinetic: 'kinetic', karaoke: 'karaoke', wave: 'wave', neon: 'neon', typewriter: 'type', type: 'type', poster: 'poster', subtitle: 'subtitle', subtitles: 'subtitle', caption: 'subtitle', captions: 'subtitle', list: 'list', classic: 'list' };
+  const WORDNUM = { zero: 0, ten: 10, twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90, hundred: 100, half: 50, max: 100, maximum: 100, full: 100 };
+
+  function clean(t) {
+    return String(t).toLowerCase().replace(/[.,!?’]/g, s => s === '’' ? "'" : '').replace(/^(hey |ok |okay )?halo,? /, '')
+      .replace(/^(please |can you |could you |would you |i want to |i wanna |let's |lets )+/, '').replace(/ please$/, '').replace(/\s+/g, ' ').trim();
+  }
+  function setVol(f) { f = clamp(f, 0, 1); if (NATIVE) N('setVolume', f); $('#audio').volume = f; return Math.round(f * 100); }
+  const getVol = () => NATIVE ? (N('getVolume') ?? 0.5) : $('#audio').volume;
+
+  /* parancs → művelet; true, ha felismerte */
+  async function run(raw) {
+    const t = clean(raw); let m;
+    const say = (hu, en) => { if (hu) show(hu, true); else voice.stop(); if (en) speak(en); return true; };
+    if (/^(next|skip|next (song|track|one)|play next|skip (this|it|song|track))$/.test(t)) { control('next'); return say('⏭ Következő dal', 'Next song'); }
+    if (/^(previous|prev|back|go back|last song|previous (song|track)|play (the )?previous( one)?)$/.test(t)) { control('prev'); return say('⏮ Előző dal', 'Previous song'); }
+    if (/^(pause|stop|hold on|pause (it|music|the music)|stop (it|music|the music))$/.test(t)) { control('pause'); return say('⏸ Szünet', 'Paused'); }
+    if (/^(play|resume|continue|unpause|start|play (it|music|the music)|keep playing)$/.test(t)) { control('play'); return say('▶ Lejátszás', 'Playing'); }
+    if (/^(restart|start over|play (it )?again|from the (start|beginning)|replay)( (the |this )?(song|track))?$/.test(t)) { control('seek', 0); return say('↺ Elölről', 'From the top'); }
+    if ((m = t.match(/^(skip|go|jump|fast) (ahead|forward)( (\d+|ten|twenty|thirty) seconds?)?$/))) { const s = +(m[4] && (WORDNUM[m[4]] ?? m[4])) || 15; control('seek', Math.min(S.dur, curPos() + s * 1000)); return say(`⏩ +${s} mp`, `Skipped ${s} seconds`); }
+    if ((m = t.match(/^(rewind|go back|back)( (\d+|ten|twenty|thirty) seconds?)$/))) { const s = +(WORDNUM[m[3]] ?? m[3]) || 15; control('seek', Math.max(0, curPos() - s * 1000)); return say(`⏪ −${s} mp`, `Back ${s} seconds`); }
+    if (/^(volume up|louder|turn it up|turn up( the volume)?|increase( the)? volume|crank it( up)?)$/.test(t)) { const v = setVol(getVol() + 0.12); return say(`🔊 Hangerő ${v}%`, `Volume ${v} percent`); }
+    if (/^(volume down|quieter|softer|turn it down|turn down( the volume)?|decrease( the)? volume|lower( the)? volume)$/.test(t)) { const v = setVol(getVol() - 0.12); return say(`🔉 Hangerő ${v}%`, `Volume ${v} percent`); }
+    if ((m = t.match(/^(set )?(the )?volume (to |at )?(\d+|[a-z]+)( percent| %)?$/))) { const n = isNaN(+m[4]) ? WORDNUM[m[4]] : +m[4]; if (n != null) { const v = setVol(n / 100); return say(`🔊 Hangerő ${v}%`, `Volume ${v} percent`); } }
+    if (/^(mute|silence)$/.test(t)) { voice._pre = getVol(); setVol(0); return say('🔇 Némítva', ''); }
+    if (/^unmute$/.test(t)) { const v = setVol(voice._pre || 0.5); return say(`🔊 Hangerő ${v}%`, 'Unmuted'); }
+    if (/^(shuffle|shuffle (on|off|it|songs|the queue)|turn (on|off) shuffle|mix it up)$/.test(t)) { control('shuffle'); return say('🔀 Keverés', 'Shuffle'); }
+    if (/^(repeat|repeat (this|on|off|song|one|it)|loop|loop (this|it|song)|turn (on|off) repeat)$/.test(t)) { control('repeat'); return say('🔁 Ismétlés', 'Repeat'); }
+    if (/^((show|turn on|open|display) (the )?lyrics|lyrics( on)?)$/.test(t)) { set.lyr = true; save(); lyrics.refresh(); paint(); return say('💬 Dalszöveg be', 'Lyrics on'); }
+    if (/^((hide|turn off|close) (the )?lyrics|lyrics off|no lyrics)$/.test(t)) { set.lyr = false; save(); lyrics.refresh(); paint(); return say('Dalszöveg ki', 'Lyrics off'); }
+    if ((m = t.match(/^(?:(?:change|switch|set) (?:the )?lyrics? (?:style )?to |lyrics? style |use )?(\w+) (?:lyrics?|style)$|^lyrics? style (\w+)$|^(?:change|switch|set) (?:the )?lyrics? (?:style )?to (\w+)$/))) {
+      const k = STYLE_EN[m[1] || m[2] || m[3]]; if (k) { set.lyrStyle = k; set.lyr = true; save(); lyrics.refresh(); paint(); const st = LSTYLES.find(s => s.id === k); return say('💬 ' + st.name + ' dalszöveg', `${m[1] || m[2] || m[3]} lyrics`); }
+    }
+    if (/^((next|change|switch|another|different) theme|change (the )?(look|style|skin))$/.test(t)) { cycleTheme(1); return say('🎨 ' + THEMES.find(x => x.id === set.theme).name, 'Theme changed'); }
+    if ((m = t.match(/^(?:(?:switch|change|go) to |use |set )?(?:the )?(\w+) theme$|^theme (\w+)$/))) { const id = THEME_EN[m[1] || m[2]]; if (id) { mountTheme(id); return say('🎨 ' + THEMES.find(x => x.id === id).name, `${m[1] || m[2]} theme`); } }
+    if (/^(what('s| is) (playing|this( song)?|the song|on)|what song is (this|playing)|who('s| is) (this|singing|playing)|name (of )?this song)$/.test(t)) {
+      if (!S.title) return say('Most nem szól semmi', 'Nothing is playing right now');
+      show(`🎵 ${S.title} — ${S.artist}`, true); speak(`This is ${S.title} by ${S.artist.split(/,|&/)[0].trim()}`); return true;
+    }
+    if (/^((open|show) (the )?(devices|speakers?|bluetooth|outputs?|cast( devices)?)|cast( this)?|connect( a)? speaker)$/.test(t)) { devices.show(); return say('📡 Eszközök', 'Here are your devices'); }
+    if ((m = t.match(/^(?:cast|send|play|connect)(?: (?:this|it|music|the music))? (?:to|on) (?:the )?(.+)$/)) && !/spotify|youtube|soundcloud/.test(m[1])) {
+      const name = norm(m[1]); const r = devices.state.casts.find(c => norm(c.name).includes(name) || name.includes(norm(c.name)));
+      if (r) { devices.castTo(r); return say('📡 ' + r.name, `Casting to ${r.name}`); }
+      if (spotify.connected) { try { const ds = await spotify.devices(); const d = ds.find(x => norm(x.name).includes(name) || name.includes(norm(x.name))); if (d) { await spotify.transfer(d.id); return say('📡 ' + d.name, `Playing on ${d.name}`); } } catch {} }
+      devices.show(); return say(`Nem találom: ${m[1]}`, `I couldn't find ${m[1]}`);
+    }
+    if (/^((open|show) (my )?(library|playlists|search)|my playlists)$/.test(t)) { lib.open({ view: /playlist/.test(t) ? 'home' : 'search' }); return say('📚 Könyvtár', 'Opening your library'); }
+    if (/^(close|cancel|never ?mind|go home|hide( it)?)$/.test(t)) { uiBack(); return say('', ''); }
+    if ((m = t.match(/^(?:search|search for|find|look up|look for|show me) (.+)$/))) {
+      lib.open({ view: 'search' }); const q = $('#libQ'); q.value = m[1]; q.dispatchEvent(new Event('input')); return say('🔍 ' + m[1], `Searching ${m[1]}`);
+    }
+    if ((m = t.match(/^(?:play|put on|listen to|i want to hear|queue up) (?:the song |song |some |a song )?(.+?)(?: (?:on|in) (spotify|youtube music|youtube|soundcloud))?$/))) {
+      let q = m[1].replace(/ by /, ' '); const via = m[2];
+      show('🔍 ' + m[1] + '…', false);
+      try {
+        const r = await itunes.search(q); const it = r.songs[0];
+        if (!it) return say(`Nincs találat: ${m[1]}`, `I couldn't find ${m[1]}`);
+        if (via) { const prev = set.playVia; set.playVia = { spotify: 'spotify', 'youtube music': 'ytmusic', youtube: 'halo', soundcloud: 'soundcloud' }[via]; await playItem(it, r.songs); set.playVia = prev; }
+        else await playItem(it, r.songs);
+        return say(`▶ ${it.title} — ${it.artist}`, `Playing ${it.title} by ${it.artist.split(/,|&/)[0].trim()}`);
+      } catch { return say('A keresés most nem sikerült', 'Search failed, please try again'); }
+    }
+    return false;
+  }
+
+  function show(text, done) {
+    tx.textContent = text; ov.classList.toggle('done', !!done);
+    clearTimeout(hideT); if (done) hideT = setTimeout(stop, 2200);
+  }
+  function start() {
+    if (active) return stop();
+    active = true; ov.classList.add('on'); ov.classList.remove('done', 'err'); tx.textContent = 'Listening…';
+    hint.textContent = 'Try: ' + HINTS.sort(() => Math.random() - 0.5).slice(0, 3).join(' · ');
+    ov.style.setProperty('--lv', 0);
+    if (NATIVE) return N('voiceStart');
+    const R = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!R) { fail('Ez a böngésző nem támogatja a hangfelismerést'); return; }
+    try {
+      webRec = new R(); webRec.lang = 'en-US'; webRec.interimResults = true; webRec.maxAlternatives = 3;
+      webRec.onresult = e => { const r = e.results[e.results.length - 1]; if (r.isFinal) handle([...r].map(a => a.transcript)); else tx.textContent = r[0].transcript; };
+      webRec.onerror = ev => fail(ev.error === 'not-allowed' ? 'Nincs mikrofon-engedély' : 'Nem értettem — próbáld újra');
+      webRec.onend = () => { if (active && !ov.classList.contains('done')) stop(); };
+      webRec.start();
+    } catch { fail('A mikrofon nem érhető el'); }
+  }
+  function stop() { active = false; ov.classList.remove('on'); if (NATIVE) N('voiceStop'); try { webRec?.abort(); } catch {} webRec = null; }
+  function fail(msg) { ov.classList.add('err'); show(msg, true); }
+  async function handle(alts) {
+    tx.textContent = '“' + alts[0] + '”';
+    for (const a of alts) { if (await run(a)) return; }
+    fail(`Nem értettem: “${alts[0]}”`); speak("Sorry, I didn't catch that");
+  }
+  ov.addEventListener('click', stop);
+  window.Halo.onVoice = o => {
+    if (typeof o === 'string') o = JSON.parse(o);
+    if ('rms' in o) ov.style.setProperty('--lv', o.rms);
+    if (o.partial) tx.textContent = o.partial;
+    if (o.state === 'thinking') ov.classList.add('think');
+    if (o.final) { ov.classList.remove('think'); handle(o.final); }
+    if (o.error) { ov.classList.remove('think'); fail(o.error === 'perm' ? 'Nincs mikrofon-engedély' : o.error === 'unavailable' ? 'A hangfelismerés nem érhető el (Google app szükséges)' : o.error === '7' ? 'Nem értettem — próbáld újra' : o.error === '6' ? 'Nem hallottam semmit' : 'Hiba a felismerésben (' + o.error + ')'); }
+  };
+  return { start, stop, run };
+})();
 
 })();</script>
 </body>
